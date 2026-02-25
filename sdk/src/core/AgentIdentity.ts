@@ -140,4 +140,12 @@ export class AgentIdentity {
     // 3. Use ed.verify(signature, payload, publicKey)
     throw new Error("Not implemented: Requires Universal Resolver integration");
   }
+
+  /**
+   * Resolves a DID into its corresponding Agent-DID Document.
+   * (Placeholder for future implementation using the Universal Resolver)
+   */
+  public static async resolve(did: string): Promise<AgentDIDDocument> {
+    throw new Error("Not implemented: Requires Universal Resolver integration");
+  }
 }

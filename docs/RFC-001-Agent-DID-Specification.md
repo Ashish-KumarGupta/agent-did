@@ -64,7 +64,8 @@ The Agent-DID document is a JSON-LD object that defines the core identity and ve
     "id": "did:agent:0x1234...abcd#key-1",
     "type": "Ed25519VerificationKey2020",
     "controller": "did:ethr:0xCreatorWalletAddress",
-    "publicKeyMultibase": "zH3C2..."
+    "publicKeyMultibase": "zH3C2...",
+    "blockchainAccountId": "eip155:1:0xAgentSmartWalletAddress"
   }],
   "authentication": ["did:agent:0x1234...abcd#key-1"]
 }

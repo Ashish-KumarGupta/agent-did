@@ -118,14 +118,14 @@ const agentIdentity = new AgentIdentity({
 });
 
 // 2. Generate the Passport and anchor it
-const passport = await agentIdentity.create({
+const { document, agentPrivateKey } = await agentIdentity.create({
   name: "SupportBot-X",
   coreModel: "gpt-4o-mini", // SDK hashes this automatically
   systemPrompt: "You are a helpful assistant...", // SDK hashes this to protect IP
   capabilities: ["read:kb", "write:ticket"]
 });
 
-console.log(`Agent registered with DID: ${passport.did}`);
+console.log(`Agent registered with DID: ${document.id}`);
 ```
 
 ### 2.3 Agent Signing (Proving Identity & Web Bot Auth)
@@ -134,14 +134,16 @@ When the agent performs an action (e.g., posting a message, executing a trade, o
 ```typescript
 // 1. Simple Message Signing (e.g., for A2A chat or blockchain transactions)
 const payload = "Approving refund #1234";
-const signature = await passport.signMessage(payload);
+const signature = await agentIdentity.signMessage(payload, agentPrivateKey);
 
 // 2. HTTP Message Signature (Web Bot Auth for Zero-Trust APIs)
 // The agent signs the HTTP request components (method, path, headers)
-const signedHeaders = await passport.signHttpRequest({
+const signedHeaders = await agentIdentity.signHttpRequest({
   method: 'POST',
   url: 'https://api.bank.com/v1/transfer',
-  body: '{"amount": 500, "currency": "USD"}'
+  body: '{"amount": 500, "currency": "USD"}',
+  agentPrivateKey: agentPrivateKey,
+  agentDid: document.id
 });
 // signedHeaders includes 'Signature' and 'Signature-Agent' (the DID)
 ```
@@ -152,16 +154,16 @@ When another agent or platform receives a signed message, it uses the SDK (which
 ```typescript
 // 1. Verify the signature matches the DID's public key
 const isValid = await AgentIdentity.verifySignature(
-  passport.did, 
+  document.id, 
   payload, 
   signature
 );
 
 if (isValid) {
   // 2. Fetch the passport to check capabilities or compliance
-  const agentDoc = await AgentIdentity.resolve(passport.did);
+  const agentDoc = await AgentIdentity.resolve(document.id);
   
-  if (agentDoc.agentMetadata.capabilities.includes("write:ticket")) {
+  if (agentDoc.agentMetadata.capabilities?.includes("write:ticket")) {
     console.log("Action authorized by a verified agent.");
   }
 }
