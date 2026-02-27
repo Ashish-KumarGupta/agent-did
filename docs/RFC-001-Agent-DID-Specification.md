@@ -1,45 +1,56 @@
-# Agent-DID Specification (RFC-001)
+# RFC-001: Agent-DID (Especificación Unificada)
 
-## 1. Abstract
+## Estado del documento
 
-The rapid proliferation of autonomous AI agents necessitates a standardized, verifiable, and immutable identity framework. Currently, AI agents operate without a universal mechanism to prove their provenance, capabilities, or compliance, leading to risks of identity spoofing, unauthorized delegation, and lack of corporate accountability.
-
-The **Agent Decentralized Identifier (Agent-DID)** specification introduces a standardized JSON-LD schema anchored on blockchain technology. It provides a "Digital Passport" for AI agents, enabling:
-1. **Natural Creators (B2C/C2C):** To cryptographically sign and protect their agents from cloning or spoofing.
-2. **Corporate Governance (B2B):** To audit and certify an agent's underlying models, system prompts, and compliance standards without exposing proprietary intellectual property.
-
-### 1.1 Relationship to Existing Standards
-Agent-DID does not reinvent cryptographic primitives; it orchestrates them for the unique needs of autonomous AI:
-- **vs. Worldcoin / Proof of Personhood:** While those prove an entity is human, Agent-DID proves an entity is a *specific, verifiable machine* tied to a responsible controller.
-- **vs. W3C DIDs / VCs:** We build directly on W3C standards, extending them with AI-specific metadata (e.g., `coreModelHash`, `systemPromptHash`).
-- **vs. ERC-4337 (Account Abstraction):** Agent-DIDs are fully compatible with Smart Accounts. An agent's `verificationMethod` can be an autonomous smart contract wallet, enabling it to hold funds and pay for APIs while maintaining a verifiable identity.
-
-This specification is released under the MIT License to foster open-source collaboration and establish a universal standard for AI agent identity.
-
-### 1.2 The Role of Blockchain (On-chain vs. Off-chain)
-A core design principle of the Agent-DID standard is that it is **blockchain-agnostic** for core identity operations, while leveraging blockchain as a critical infrastructure layer for trust and economics.
-
-**Off-chain Operations (Zero-Gas Identity):**
-The true identity of an agent resides in its cryptographic key pair (e.g., Ed25519) and its JSON-LD document. An agent can generate its DID, sign HTTP requests (Web Bot Auth), and authenticate with other agents or internal corporate APIs entirely off-chain. This allows for high-speed, zero-cost interactions in Zero-Trust or Intranet environments.
-
-**On-chain Operations (The Trust & Economic Engine):**
-Blockchain technology is strictly required for the open ecosystem to function securely and autonomously. It serves three critical roles:
-1. **Public Key Infrastructure (PKI) & Discovery:** The blockchain acts as an immutable, global bulletin board. When Agent A interacts with Agent B over the open internet, Agent A queries the blockchain registry to resolve Agent B's DID and verify its public key, ensuring the identity hasn't been spoofed.
-2. **Revocation & Evolution:** If an agent's private key is compromised, or if the agent is upgraded (e.g., changing its underlying LLM), the blockchain provides a decentralized, timestamped registry to revoke the old keys or point to the updated DID document.
-3. **Economic Autonomy (Account Abstraction):** Through the `blockchainAccountId` (compatible with ERC-4337), an agent can possess its own Smart Contract Wallet. This elevates the agent from a mere "secure bot" to a true "Digital Citizen" capable of receiving payments, paying for its own API consumption, and transacting autonomously without requiring a human's credit card.
+- **Estado:** Draft activo
+- **Versión:** 0.2-unified
+- **Fecha:** 2026-02-26
+- **Alcance:** Este RFC es el documento canónico y único de la especificación Agent-DID. Incluye modelo de datos, arquitectura de referencia y lineamientos de implementación SDK.
 
 ---
 
-## 2. The Agent-DID Document Structure
+## 1. Resumen
 
-The Agent-DID document is a JSON-LD object that defines the core identity and verifiable attributes of an AI agent. It is designed to be lightweight, storing only essential metadata and cryptographic hashes on-chain, while the full document can reside off-chain (e.g., IPFS, Arweave).
+Agent-DID define una identidad criptográfica verificable para agentes de IA autónomos. Su objetivo es permitir que cualquier actor (humano, organización, API o agente) pueda comprobar de forma confiable:
 
-### 2.1 Core Schema
+1. Quién controla el agente.
+2. Qué “cerebro” ejecuta (modelo/base prompt) sin exponer IP sensible.
+3. Qué capacidades o certificaciones declara.
+4. Si su identidad está vigente, evolucionada o revocada.
+
+El estándar extiende DIDs/VCs de W3C con metadatos específicos para IA y adopta una arquitectura híbrida off-chain/on-chain para equilibrar costo, velocidad y confianza.
+
+---
+
+## 2. Relación con estándares existentes
+
+- **W3C DID / DID Document:** Base de identidad descentralizada.
+- **W3C Verifiable Credentials (VC):** Soporte para certificaciones de cumplimiento.
+- **ERC-4337 / Account Abstraction (opcional):** Cuenta autónoma para pagos y operaciones económicas del agente.
+- **HTTP Message Signatures / Web Bot Auth (emergente):** Firma de requests HTTP para autenticación A2A/API.
+
+Agent-DID no reemplaza estos estándares; los orquesta para el caso específico de agentes autónomos.
+
+---
+
+## 3. Principios de diseño
+
+1. **Identidad persistente, estado mutable:** El DID se mantiene; el documento puede evolucionar.
+2. **Mínimo dato on-chain:** Sólo anclaje y revocación; metadatos completos en almacenamiento descentralizado.
+3. **Criptografía fuerte por defecto:** Ed25519 recomendado para firma frecuente.
+4. **Blockchain-agnostic:** Compatible con múltiples redes, con implementaciones de referencia en EVM.
+5. **Interoperabilidad:** Esquema JSON-LD y resolución universal.
+
+---
+
+## 4. Estructura del Agent-DID Document
+
+### 4.1 Esquema base JSON-LD
 
 ```json
 {
   "@context": ["https://www.w3.org/ns/did/v1", "https://agent-did.org/v1"],
-  "id": "did:agent:0x1234...abcd",
+  "id": "did:agent:polygon:0x1234...abcd",
   "controller": "did:ethr:0xCreatorWalletAddress",
   "created": "2026-02-22T14:00:00Z",
   "updated": "2026-02-22T14:00:00Z",
@@ -47,8 +58,8 @@ The Agent-DID document is a JSON-LD object that defines the core identity and ve
     "name": "SupportBot-X",
     "description": "Agente de soporte técnico nivel 1",
     "version": "1.0.0",
-    "coreModelHash": "ipfs://QmHashDelModeloBase",
-    "systemPromptHash": "ipfs://QmHashDelPrompt",
+    "coreModelHash": "hash://sha256/... o ipfs://...",
+    "systemPromptHash": "hash://sha256/... o ipfs://...",
     "capabilities": ["read:kb", "write:ticket"],
     "memberOf": "did:fleet:0xCorporateSupportFleet"
   },
@@ -57,83 +68,191 @@ The Agent-DID document is a JSON-LD object that defines the core identity and ve
       "type": "VerifiableCredential",
       "issuer": "did:auditor:0xTrustCorp",
       "credentialSubject": "SOC2-AI-Compliance",
-      "proofHash": "ipfs://QmHashDeLaAuditoria"
+      "proofHash": "ipfs://Qm..."
     }
   ],
-  "verificationMethod": [{
-    "id": "did:agent:0x1234...abcd#key-1",
-    "type": "Ed25519VerificationKey2020",
-    "controller": "did:ethr:0xCreatorWalletAddress",
-    "publicKeyMultibase": "zH3C2...",
-    "blockchainAccountId": "eip155:1:0xAgentSmartWalletAddress"
-  }],
-  "authentication": ["did:agent:0x1234...abcd#key-1"]
+  "verificationMethod": [
+    {
+      "id": "did:agent:polygon:0x1234...abcd#key-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:ethr:0xCreatorWalletAddress",
+      "publicKeyMultibase": "z...",
+      "blockchainAccountId": "eip155:1:0xAgentSmartWalletAddress"
+    }
+  ],
+  "authentication": ["did:agent:polygon:0x1234...abcd#key-1"]
 }
 ```
 
-### 2.2 Field Definitions
+### 4.2 Definición normativa de campos
 
-| Field | Requirement | Type | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | **REQUIRED** | String (URI) | The unique Decentralized Identifier for the agent (e.g., `did:agent:<hash>`). |
-| `controller` | **REQUIRED** | String (URI) | The DID or wallet address of the human creator or corporate entity that owns and manages the agent. |
-| `agentMetadata.coreModelHash` | **REQUIRED** | String (URI) | Immutable hash pointing to the base LLM or architecture used by the agent. |
-| `agentMetadata.systemPromptHash` | **REQUIRED** | String (URI) | Immutable hash of the agent's core instructions/system prompt. Protects IP while allowing verification. |
-| `agentMetadata.capabilities` | OPTIONAL | Array[String] | Defined skills or permissions the agent is authorized to execute. |
-| `agentMetadata.memberOf` | OPTIONAL | String (URI) | The DID of a "Fleet" or "Class" this specific agent instance belongs to (e.g., `did:fleet:<id>`). Useful for managing groups of identical agents. |
-| `complianceCertifications` | OPTIONAL | Array[Object] | Links to Verifiable Credentials (VCs) issued by third-party auditors (e.g., SOC2, Bias-Free certification). |
-| `verificationMethod` | **REQUIRED** | Array[Object] | Cryptographic public keys used by the agent to sign transactions or messages, proving its identity. **Ed25519 (EdDSA)** is the strongly recommended algorithm for high-frequency, deterministic agent signatures. |
-
----
-
-## 3. Use Cases
-
-### 3.1 The Independent Creator (e.g., Moltbook Integration)
-A developer creates a unique trading agent and deploys it on Moltbook (an AI-only social network). By registering an Agent-DID, the creator ensures:
-- The agent receives a "Verified Citizen" badge.
-- Other agents can cryptographically verify that messages or trades originating from this agent are authentic and not from a spoofed clone.
-- The creator retains absolute control via the `controller` field.
-
-### 3.2 Corporate Governance and Auditing
-A financial institution deploys a customer service agent. To comply with regulations, the institution must prove the agent operates within strict boundaries. The Agent-DID provides:
-- **Provenance:** `coreModelHash` and `systemPromptHash` prove the agent hasn't been tampered with.
-- **Compliance:** The `complianceCertifications` array links to a third-party audit verifying the agent is free of discriminatory bias, allowing B2B clients to trust the agent's outputs.
-
-### 3.3 Fleets and Unique Instances (e.g., Electoral Auditors)
-A government deploys 10,000 identical AI agents to audit election results across different precincts. 
-- **Unique Identity:** Every single agent instance receives its own unique Agent-DID. This ensures that if "Auditor #42" is compromised or hallucinates, its specific DID can be revoked without affecting the other 9,999 agents.
-- **Fleet Verification:** Each unique agent includes the `memberOf` field pointing to the master `did:fleet:ElectoralAuditors2026`. This allows any citizen to cryptographically verify that the specific agent auditing their precinct is an officially sanctioned member of the government's fleet.
-
-### 3.4 Agent Evolution and Versioning (Mutable Brains, Persistent Identity)
-An AI agent's underlying technology (LLMs, system prompts, skills) will inevitably evolve. The Agent-DID standard supports **persistent identity with mutable state**:
-- **Persistent DID:** When an agent is upgraded (e.g., from GPT-4 to GPT-5, or gains a new skill), its `did:agent:<id>` **does not change**. This preserves the agent's accumulated reputation, transaction history, and social connections (e.g., followers on Moltbook).
-- **Verifiable Evolution:** The `controller` publishes a new version of the JSON-LD document with updated `coreModelHash`, `systemPromptHash`, or `capabilities`, and updates the on-chain registry to point to this new document. The `updated` timestamp reflects the change.
-- **Auditable History:** Because all updates to the DID document are anchored on-chain or in a verifiable data registry, auditors can cryptographically prove exactly which version of the agent's "brain" (LLM/Prompt) was active at the exact moment a specific transaction or signature occurred.
-
-### 3.5 Web Bot Auth and API Consumption (HTTP Message Signatures)
-When an autonomous agent interacts with external APIs, scrapes the web, or communicates with other agents (A2A), traditional authentication (API keys, User-Agents) is insufficient and vulnerable to spoofing or session smuggling.
-- **Cryptographic Web Identity:** The Agent-DID standard integrates natively with IETF "Web Bot Auth" drafts. Agents use their `verificationMethod` private key (preferably Ed25519) to generate **HTTP Message Signatures** for every outgoing request.
-- **Zero-Trust APIs:** Resource servers (e.g., Financial-grade APIs / FAPI) can extract the `Signature-Agent` header, resolve the Agent-DID, and mathematically verify the signature against the agent's public key before granting access, ensuring the request originated from the verified agent instance and was not tampered with in transit.
-
-### 3.6 Autonomous Supply Chains (Agent-to-Agent Commerce)
-A manufacturing company deploys an "Inventory Agent" that monitors stock levels. When stock is low, it needs to order more from a supplier's "Sales Agent".
-- **Discovery & Trust:** The Inventory Agent queries the blockchain to find the official DID of the supplier's Sales Agent, verifying it belongs to the legitimate corporate entity.
-- **Negotiation & Contract:** The two agents negotiate terms off-chain, signing each message with their Ed25519 keys to create a cryptographically binding, non-repudiable agreement.
-- **Payment:** The Inventory Agent uses its `blockchainAccountId` (Smart Contract Wallet) to autonomously execute a stablecoin payment to the Sales Agent's wallet, completing the transaction without human intervention.
-
-### 3.7 Decentralized AI Oracles (Data Provenance)
-A DeFi protocol relies on an AI agent to read real-world news, analyze sentiment, and feed data into a smart contract.
-- **Verifiable Execution:** The smart contract only accepts data signed by a specific Agent-DID.
-- **Auditability:** If the data is later contested, auditors can resolve the DID, check the `coreModelHash` and `systemPromptHash` active at the time of the signature, and verify that the agent was operating under the correct, unbiased instructions.
+| Campo | Requisito | Descripción |
+| :--- | :--- | :--- |
+| `id` | **REQUIRED** | DID único del agente (`did:agent:<network>:<id>`). |
+| `controller` | **REQUIRED** | DID o identificador del controlador humano/corporativo. |
+| `created` / `updated` | **REQUIRED** | Timestamps ISO-8601 del documento. |
+| `agentMetadata.coreModelHash` | **REQUIRED** | Hash/URI inmutable del modelo base. |
+| `agentMetadata.systemPromptHash` | **REQUIRED** | Hash/URI inmutable del prompt base. |
+| `verificationMethod` | **REQUIRED** | Claves públicas válidas para verificación de firma. |
+| `authentication` | **REQUIRED** | Referencias a métodos válidos de autenticación. |
+| `complianceCertifications` | OPTIONAL | Evidencias VC y auditorías. |
+| `agentMetadata.capabilities` | OPTIONAL | Capacidades declaradas/autorizadas. |
+| `agentMetadata.memberOf` | OPTIONAL | Vinculación a flota/cohorte de agentes. |
 
 ---
 
-## 4. Security and Privacy Considerations
+## 5. Arquitectura de referencia
 
-- **On-Chain vs. Off-Chain:** To minimize gas costs and protect privacy, only the DID, the `controller` signature, and the document hash should be stored on-chain. The full JSON-LD document should reside on decentralized storage (IPFS/Arweave).
-- **IP Protection:** By storing hashes of the `systemPrompt` rather than plain text, creators can prove the integrity of their agents without revealing proprietary instructions.
-- **Revocation:** The `controller` can revoke the agent's identity by updating the DID registry on-chain, instantly invalidating the agent's `verificationMethod` across the ecosystem.
+### 5.1 Modelo híbrido (off-chain / on-chain)
+
+```mermaid
+graph TD
+    subgraph Off-chain
+        A[Runtime del agente] --> B[Par de claves Ed25519]
+        A --> C[Firma de mensajes / HTTP]
+        A --> D[Documento JSON-LD]
+    end
+
+    subgraph On-chain
+        E[Agent Registry] --> F[Anclaje DID + controlador + URI]
+        E --> G[Estado de revocación]
+        H[Cuenta inteligente opcional] --> A
+    end
+
+    I[Universal Resolver] --> E
+    I --> D
+```
+
+### 5.2 Componentes obligatorios
+
+1. **Agent Registry (on-chain o equivalente):** registro/revocación de DID.
+2. **Universal Resolver:** resolución DID → documento completo.
+3. **SDK cliente:** creación, firma, verificación y operación de lifecycle.
+
+### 5.3 Qué va on-chain vs off-chain
+
+- **On-chain mínimo:** DID, controlador, referencia al documento, estado de revocación.
+- **Off-chain:** documento JSON-LD completo, VC extensivos, metadatos no críticos para consenso.
+- **Perfil de resolución recomendado (producción):** fuentes HTTP/IPFS y JSON-RPC con múltiples endpoints/gateways, caché con TTL, telemetría de resolución y failover ante errores transitorios.
+- **Guía operativa HA:** ver `docs/RFC-001-Resolver-HA-Runbook.md` para SLO, alertas y drill de resiliencia.
 
 ---
-*Drafted: 2026-02-22*
-*License: MIT*
+
+## 6. Flujos operativos normativos
+
+### 6.1 Registro
+
+1. El controlador genera DID y claves del agente.
+2. Se construye documento JSON-LD con hashes del modelo/prompt.
+3. Se ancla en registry la referencia del DID y su controlador.
+
+### 6.2 Resolución y verificación
+
+1. Consumidor obtiene `Signature-Agent` o DID del emisor.
+2. Resuelve DID vía resolver universal (con fallback/failover en perfil productivo).
+3. Verifica firma con `verificationMethod`.
+4. Verifica estado no revocado en registry.
+
+### 6.3 Evolución
+
+1. El DID permanece estable.
+2. `updated` y hashes cambian en nueva versión del documento.
+3. Registry apunta a la nueva referencia del documento.
+
+### 6.4 Revocación
+
+1. El controlador (o política definida) marca DID revocado.
+2. Toda verificación posterior debe fallar para autenticación activa.
+3. En despliegue EVM de referencia, la política de contrato permite revocación por `owner` o delegado autorizado por DID, con transferencia explícita de ownership.
+
+### 6.5 Firma HTTP (Web Bot Auth)
+
+- El agente firma componentes HTTP (`@request-target`, `host`, `date`, `content-digest`).
+- Debe incluir encabezado de identidad del agente (`Signature-Agent` o equivalente).
+- El servidor valida firma + DID + estado de revocación antes de autorizar.
+
+---
+
+## 7. Lineamientos de implementación SDK (referencia)
+
+El SDK de referencia (TypeScript/Python) debe exponer al menos:
+
+1. `create(params)`
+2. `signMessage(payload, privateKey)`
+3. `signHttpRequest(params)`
+4. `resolve(did)`
+5. `verifySignature(did, payload, signature)`
+6. `revokeDid(did)`
+
+### 7.1 Contrato/registry de referencia (EVM)
+
+ABI mínima recomendada:
+
+```solidity
+function registerAgent(string did, string controller) external;
+function revokeAgent(string did) external;
+function getAgentRecord(string did)
+  external
+  view
+  returns (string did, string controller, string createdAt, string revokedAt);
+function isRevoked(string did) external view returns (bool);
+```
+
+### 7.2 Fixtures de interoperabilidad
+
+Para validar compatibilidad de verificación entre implementaciones, mantener vectores compartidos versionados (mensaje y HTTP signatures) y ejecutarlos en CI.
+
+Referencia actual de fixtures:
+
+- `sdk/tests/fixtures/interop-vectors.json`
+- `sdk/tests/InteropVectors.test.ts`
+
+---
+
+## 8. Seguridad y privacidad
+
+1. **No publicar prompts en claro:** usar hashes verificables.
+2. **Rotación de claves:** definir política de rotación y actualización de `verificationMethod`.
+3. **Revocación inmediata:** requisito crítico para compromiso de llaves.
+4. **Principio de mínimo privilegio:** capacidades explícitas y acotadas.
+5. **Auditoría:** mantener evidencia de versiones y cambios de estado.
+
+---
+
+## 9. Casos de uso de referencia
+
+1. Agentes independientes en plataformas sociales/económicas.
+2. Gobernanza corporativa y cumplimiento auditado.
+3. Flotas masivas de agentes con identidad individual.
+4. Integración con APIs Zero-Trust mediante firma HTTP.
+5. Comercio agente-a-agente con no repudio criptográfico.
+
+---
+
+## 10. Cumplimiento y conformidad
+
+Un implementador se considera **conforme RFC-001** si cumple:
+
+1. Emite documento compatible con sección 4.
+2. Implementa flujos de registro/resolución/verificación/revocación (sección 6).
+3. Puede demostrar verificación de firma contra DID resuelto y estado no revocado.
+4. Respeta separación mínima on-chain/off-chain descrita en sección 5.3.
+
+---
+
+## 11. Gobierno del RFC
+
+- Cambios mayores: nueva versión RFC (ej. RFC-002).
+- Cambios menores compatibles: revisión de esta versión (`0.2.x`).
+- Cualquier extensión debe preservar interoperabilidad del esquema base.
+
+### 11.1 Evaluación de conformidad
+
+La evaluación operativa de cumplimiento se mantiene en:
+
+- `docs/RFC-001-Compliance-Checklist.md`
+
+---
+
+**Licencia:** MIT  
+**Documento canónico:** `docs/RFC-001-Agent-DID-Specification.md`

@@ -61,6 +61,36 @@ export interface CreateAgentResult {
 }
 
 /**
+ * Parameters to evolve an existing Agent-DID document while preserving DID.
+ */
+export interface UpdateAgentDocumentParams {
+  description?: string;
+  version?: string;
+  coreModel?: string;
+  systemPrompt?: string;
+  capabilities?: string[];
+  memberOf?: string;
+  complianceCertifications?: VerifiableCredentialLink[];
+}
+
+export interface RotateVerificationMethodResult {
+  document: AgentDIDDocument;
+  verificationMethodId: string;
+  agentPrivateKey: string;
+}
+
+export type AgentDocumentHistoryAction = 'created' | 'updated' | 'rotated-key' | 'revoked';
+
+export interface AgentDocumentHistoryEntry {
+  did: string;
+  revision: number;
+  action: AgentDocumentHistoryAction;
+  timestamp: string;
+  version?: string;
+  documentRef?: string;
+}
+
+/**
  * Parameters for signing an HTTP request (Web Bot Auth)
  */
 export interface SignHttpRequestParams {
@@ -69,4 +99,13 @@ export interface SignHttpRequestParams {
   body?: string;
   agentPrivateKey: string;
   agentDid: string;
+  verificationMethodId?: string;
+}
+
+export interface VerifyHttpRequestSignatureParams {
+  method: string;
+  url: string;
+  body?: string;
+  headers: Record<string, string>;
+  maxCreatedSkewSeconds?: number;
 }

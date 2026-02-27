@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { AgentIdentity } from '../src/core/AgentIdentity';
 import { CreateAgentParams } from '../src/core/types';
+import { InMemoryAgentRegistry } from '../src/registry/InMemoryAgentRegistry';
 
 describe('AgentIdentity Core Module', () => {
   // Create a random wallet to act as the "Creator" (Controller)
@@ -13,6 +14,8 @@ describe('AgentIdentity Core Module', () => {
       signer: creatorWallet,
       network: 'polygon'
     });
+
+    AgentIdentity.setRegistry(new InMemoryAgentRegistry());
   });
 
   it('should successfully create a valid Agent-DID Document (RFC-001 Compliant)', async () => {
@@ -107,7 +110,325 @@ describe('AgentIdentity Core Module', () => {
     expect(headers['Signature']).toBeDefined();
     expect(headers['Signature-Input']).toBeDefined();
     expect(headers['Signature-Agent']).toEqual(document.id);
-    expect(headers['Date']).toBeDefined();
-    expect(headers['Content-Digest']).toBeDefined();
+    expect(headers['Date']).toContain('GMT');
+    expect(headers['Content-Digest']).toMatch(/^sha-256=:.+:$/);
+
+    const isHttpValid = await AgentIdentity.verifyHttpRequestSignature({
+      method: requestParams.method,
+      url: requestParams.url,
+      body: requestParams.body,
+      headers
+    });
+
+    expect(isHttpValid).toBe(true);
+  });
+
+  it('should reject tampered HTTP request bodies during signature verification', async () => {
+    const { document, agentPrivateKey } = await agentIdentity.create({
+      name: 'TamperCheckBot',
+      coreModel: 'test',
+      systemPrompt: 'test'
+    });
+
+    const requestParams = {
+      method: 'POST',
+      url: 'https://api.example.com/v1/transfer',
+      body: '{"amount":100}',
+      agentPrivateKey,
+      agentDid: document.id
+    };
+
+    const headers = await agentIdentity.signHttpRequest(requestParams);
+
+    const tamperedValid = await AgentIdentity.verifyHttpRequestSignature({
+      method: requestParams.method,
+      url: requestParams.url,
+      body: '{"amount":999}',
+      headers
+    });
+
+    expect(tamperedValid).toBe(false);
+  });
+
+  it('should reject HTTP signatures missing required signed components', async () => {
+    const { document, agentPrivateKey } = await agentIdentity.create({
+      name: 'MissingComponentBot',
+      coreModel: 'test',
+      systemPrompt: 'test'
+    });
+
+    const requestParams = {
+      method: 'POST',
+      url: 'https://api.example.com/v1/claims',
+      body: '{"claim": true}',
+      agentPrivateKey,
+      agentDid: document.id
+    };
+
+    const headers = await agentIdentity.signHttpRequest(requestParams);
+    const signatureInput = headers['Signature-Input'];
+    headers['Signature-Input'] = signatureInput.replace('"content-digest"', '');
+
+    const valid = await AgentIdentity.verifyHttpRequestSignature({
+      method: requestParams.method,
+      url: requestParams.url,
+      body: requestParams.body,
+      headers
+    });
+
+    expect(valid).toBe(false);
+  });
+
+  it('should reject HTTP signatures with unsupported algorithm', async () => {
+    const { document, agentPrivateKey } = await agentIdentity.create({
+      name: 'UnsupportedAlgBot',
+      coreModel: 'test',
+      systemPrompt: 'test'
+    });
+
+    const requestParams = {
+      method: 'POST',
+      url: 'https://api.example.com/v1/claims',
+      body: '{"claim": true}',
+      agentPrivateKey,
+      agentDid: document.id
+    };
+
+    const headers = await agentIdentity.signHttpRequest(requestParams);
+    headers['Signature-Input'] = headers['Signature-Input'].replace('alg="ed25519"', 'alg="rsa-pss-sha512"');
+
+    const valid = await AgentIdentity.verifyHttpRequestSignature({
+      method: requestParams.method,
+      url: requestParams.url,
+      body: requestParams.body,
+      headers
+    });
+
+    expect(valid).toBe(false);
+  });
+
+  it('should verify HTTP signatures with alternate signature labels and additional covered components', async () => {
+    const { document, agentPrivateKey } = await agentIdentity.create({
+      name: 'InteropLabelBot',
+      coreModel: 'test',
+      systemPrompt: 'test'
+    });
+
+    const requestParams = {
+      method: 'POST',
+      url: 'https://api.example.com/v1/interop',
+      body: '{"interop": true}',
+      agentPrivateKey,
+      agentDid: document.id
+    };
+
+    const headers = await agentIdentity.signHttpRequest(requestParams);
+
+    headers['Signature'] = headers['Signature'].replace(/^sig1/, 'sigA');
+    headers['Signature-Input'] = headers['Signature-Input']
+      .replace(/^sig1/, 'sigA')
+      .replace('("@request-target" "host" "date" "content-digest")', '("@request-target" "host" "date" "content-digest" "x-extra")');
+
+    const valid = await AgentIdentity.verifyHttpRequestSignature({
+      method: requestParams.method,
+      url: requestParams.url,
+      body: requestParams.body,
+      headers
+    });
+
+    expect(valid).toBe(true);
+  });
+
+  it('should verify HTTP signatures when signature dictionaries contain multiple labels', async () => {
+    const { document, agentPrivateKey } = await agentIdentity.create({
+      name: 'InteropMultiSigBot',
+      coreModel: 'test',
+      systemPrompt: 'test'
+    });
+
+    const requestParams = {
+      method: 'POST',
+      url: 'https://api.example.com/v1/interop',
+      body: '{"multi": true}',
+      agentPrivateKey,
+      agentDid: document.id
+    };
+
+    const headers = await agentIdentity.signHttpRequest(requestParams);
+
+    headers['Signature'] = `other=:ZmFrZVNpZw==:, ${headers['Signature']}`;
+    headers['Signature-Input'] = `other=("@request-target");created=1;keyid="${document.id}#key-1";alg="ed25519", ${headers['Signature-Input']}`;
+
+    const valid = await AgentIdentity.verifyHttpRequestSignature({
+      method: requestParams.method,
+      url: requestParams.url,
+      body: requestParams.body,
+      headers
+    });
+
+    expect(valid).toBe(true);
+  });
+
+  it('should resolve a created DID document', async () => {
+    const { document } = await agentIdentity.create({
+      name: 'ResolverBot',
+      coreModel: 'test-model',
+      systemPrompt: 'test-prompt'
+    });
+
+    const resolved = await AgentIdentity.resolve(document.id);
+
+    expect(resolved.id).toEqual(document.id);
+    expect(resolved.controller).toEqual(document.controller);
+  });
+
+  it('should verify a valid signature and reject a tampered payload', async () => {
+    const { document, agentPrivateKey } = await agentIdentity.create({
+      name: 'VerifierBot',
+      coreModel: 'test-model',
+      systemPrompt: 'test-prompt'
+    });
+
+    const payload = 'approve:invoice:123';
+    const signature = await agentIdentity.signMessage(payload, agentPrivateKey);
+
+    const isValid = await AgentIdentity.verifySignature(document.id, payload, signature);
+    const isTamperedValid = await AgentIdentity.verifySignature(document.id, `${payload}-tampered`, signature);
+
+    expect(isValid).toBe(true);
+    expect(isTamperedValid).toBe(false);
+  });
+
+  it('should throw when resolving an unknown DID', async () => {
+    await expect(AgentIdentity.resolve('did:agent:polygon:0xunknown')).rejects.toThrow('DID not found');
+  });
+
+  it('should mark a DID as invalid after revocation', async () => {
+    const { document, agentPrivateKey } = await agentIdentity.create({
+      name: 'RevokedBot',
+      coreModel: 'test-model',
+      systemPrompt: 'test-prompt'
+    });
+
+    const payload = 'approve:payment:789';
+    const signature = await agentIdentity.signMessage(payload, agentPrivateKey);
+
+    const isValidBefore = await AgentIdentity.verifySignature(document.id, payload, signature);
+    expect(isValidBefore).toBe(true);
+
+    await AgentIdentity.revokeDid(document.id);
+
+    const isValidAfter = await AgentIdentity.verifySignature(document.id, payload, signature);
+    expect(isValidAfter).toBe(false);
+
+    await expect(AgentIdentity.resolve(document.id)).rejects.toThrow('DID is revoked');
+  });
+
+  it('should evolve an existing DID document while preserving DID', async () => {
+    const { document } = await agentIdentity.create({
+      name: 'EvolveBot',
+      coreModel: 'gpt-4o-mini',
+      systemPrompt: 'initial prompt',
+      capabilities: ['read:kb']
+    });
+
+    const updated = await AgentIdentity.updateDidDocument(document.id, {
+      version: '1.1.0',
+      description: 'Updated description',
+      coreModel: 'gpt-4.1-mini',
+      systemPrompt: 'updated prompt',
+      capabilities: ['read:kb', 'write:ticket']
+    });
+
+    expect(updated.id).toEqual(document.id);
+    expect(updated.updated).not.toEqual(document.updated);
+    expect(updated.agentMetadata.version).toEqual('1.1.0');
+    expect(updated.agentMetadata.description).toEqual('Updated description');
+    expect(updated.agentMetadata.capabilities).toEqual(['read:kb', 'write:ticket']);
+    expect(updated.agentMetadata.coreModelHash).not.toEqual(document.agentMetadata.coreModelHash);
+    expect(updated.agentMetadata.systemPromptHash).not.toEqual(document.agentMetadata.systemPromptHash);
+
+    const registry = new InMemoryAgentRegistry();
+    AgentIdentity.setRegistry(registry);
+
+    const created = await agentIdentity.create({
+      name: 'RefBot',
+      coreModel: 'gpt-4o-mini',
+      systemPrompt: 'initial prompt'
+    });
+
+    const recordBefore = await registry.getRecord(created.document.id);
+    expect(recordBefore?.documentRef).toBeDefined();
+
+    await AgentIdentity.updateDidDocument(created.document.id, {
+      systemPrompt: 'new prompt for ref change'
+    });
+
+    const recordAfter = await registry.getRecord(created.document.id);
+    expect(recordAfter?.documentRef).toBeDefined();
+    expect(recordAfter?.documentRef).not.toEqual(recordBefore?.documentRef);
+  });
+
+  it('should throw when updating with an empty DID', async () => {
+    await expect(AgentIdentity.updateDidDocument('', { version: '2.0.0' })).rejects.toThrow('DID is required');
+  });
+
+  it('should rotate verification method and invalidate old key for active auth', async () => {
+    const { document, agentPrivateKey: oldPrivateKey } = await agentIdentity.create({
+      name: 'RotationBot',
+      coreModel: 'gpt-4o-mini',
+      systemPrompt: 'rotation test prompt'
+    });
+
+    const payload = 'approve:rotation:1';
+    const oldSignature = await agentIdentity.signMessage(payload, oldPrivateKey);
+
+    const validBeforeRotation = await AgentIdentity.verifySignature(document.id, payload, oldSignature);
+    expect(validBeforeRotation).toBe(true);
+
+    const rotation = await AgentIdentity.rotateVerificationMethod(document.id);
+    const newSignature = await agentIdentity.signMessage(payload, rotation.agentPrivateKey);
+
+    const oldValidAfterRotation = await AgentIdentity.verifySignature(document.id, payload, oldSignature);
+    const newValidAfterRotation = await AgentIdentity.verifySignature(
+      document.id,
+      payload,
+      newSignature,
+      rotation.verificationMethodId
+    );
+
+    expect(oldValidAfterRotation).toBe(false);
+    expect(newValidAfterRotation).toBe(true);
+    expect(rotation.document.authentication).toEqual([rotation.verificationMethodId]);
+  });
+
+  it('should keep auditable history for create, update, rotate, revoke lifecycle', async () => {
+    const { document } = await agentIdentity.create({
+      name: 'AuditBot',
+      coreModel: 'gpt-4o-mini',
+      systemPrompt: 'audit trail baseline prompt'
+    });
+
+    await AgentIdentity.updateDidDocument(document.id, {
+      version: '1.0.1',
+      systemPrompt: 'audit trail updated prompt'
+    });
+
+    await AgentIdentity.rotateVerificationMethod(document.id);
+    await AgentIdentity.revokeDid(document.id);
+
+    const history = AgentIdentity.getDocumentHistory(document.id);
+
+    expect(history.length).toBeGreaterThanOrEqual(4);
+    expect(history[0].action).toEqual('created');
+    expect(history[1].action).toEqual('updated');
+    expect(history[2].action).toEqual('rotated-key');
+    expect(history[3].action).toEqual('revoked');
+
+    for (let index = 0; index < history.length; index += 1) {
+      expect(history[index].revision).toEqual(index + 1);
+      expect(history[index].documentRef).toBeDefined();
+      expect(history[index].timestamp.endsWith('Z')).toBe(true);
+    }
   });
 });

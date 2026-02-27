@@ -1,4 +1,11 @@
 {
+  "scripts": {
+    "smoke:e2e": "node scripts/e2e-smoke.js",
+    "smoke:ha": "node scripts/resolver-ha-smoke.js",
+    "smoke:policy": "node scripts/revocation-policy-smoke.js",
+    "smoke:rpc": "node scripts/rpc-resolver-smoke.js",
+    "conformance:rfc001": "node scripts/conformance-rfc001.js"
+  },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
     "@noble/hashes": "^2.0.1"

@@ -9,16 +9,24 @@
 // Export Core Types (RFC-001 Schema)
 export {
   AgentMetadata,
+  AgentDocumentHistoryAction,
+  AgentDocumentHistoryEntry,
   VerifiableCredentialLink,
   VerificationMethod,
   AgentDIDDocument,
-  CreateAgentParams
+  CreateAgentParams,
+  UpdateAgentDocumentParams,
+  RotateVerificationMethodResult,
+  VerifyHttpRequestSignatureParams
 } from './core/types';
 
 // Export Core Identity Class
 export {
   AgentIdentity,
-  AgentIdentityConfig
+  AgentIdentityConfig,
+  ProductionResolverProfileConfig,
+  ProductionHttpResolverProfileConfig,
+  ProductionJsonRpcResolverProfileConfig
 } from './core/AgentIdentity';
 
 // Export Cryptographic Utilities
@@ -28,6 +36,61 @@ export {
   generateAgentMetadataHash
 } from './crypto/hash';
 
-// Note: Resolver and Registry modules will be exported here in future versions
-// export * from './resolver';
-// export * from './registry';
+export {
+  isUnixTimestampString,
+  unixStringToIso,
+  isoToUnixString,
+  normalizeTimestampToIso
+} from './core/time';
+
+// Export Resolver APIs
+export {
+  DIDResolver,
+  DIDDocumentSource,
+  UniversalResolverConfig,
+  ResolverCacheStats,
+  ResolverResolutionEvent,
+  ResolverResolutionStage
+} from './resolver/types';
+
+export {
+  InMemoryDIDResolver
+} from './resolver/InMemoryDIDResolver';
+
+export {
+  UniversalResolverClient
+} from './resolver/UniversalResolverClient';
+
+export {
+  HttpDIDDocumentSource,
+  HttpDIDDocumentSourceConfig
+} from './resolver/HttpDIDDocumentSource';
+
+export {
+  JsonRpcDIDDocumentSource,
+  JsonRpcDIDDocumentSourceConfig
+} from './resolver/JsonRpcDIDDocumentSource';
+
+// Export Registry APIs
+export {
+  AgentRegistry,
+  AgentRegistryRecord
+} from './registry/types';
+
+export {
+  InMemoryAgentRegistry
+} from './registry/InMemoryAgentRegistry';
+
+export {
+  EvmAgentRegistry
+} from './registry/EvmAgentRegistry';
+
+export {
+  EthersAgentRegistryContractClient
+} from './registry/EthersAgentRegistryContractClient';
+
+export {
+  EvmTxResponse,
+  EvmAgentRegistryContract,
+  EvmAgentRegistryAdapterConfig
+} from './registry/evm-types';
