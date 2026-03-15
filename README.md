@@ -74,8 +74,10 @@ This command runs SDK build/tests and operational smokes (policy, HA, RPC, E2E).
 - Compliance checklist: [docs/RFC-001-Compliance-Checklist.md](docs/RFC-001-Compliance-Checklist.md)
 - Implementation backlog: [docs/RFC-001-Implementation-Backlog.md](docs/RFC-001-Implementation-Backlog.md)
 - Resolver HA runbook: [docs/RFC-001-Resolver-HA-Runbook.md](docs/RFC-001-Resolver-HA-Runbook.md)
+- Complete SDK course (7 modules, Spanish): [docs/Curso-Completo-Agent-DID-SDK.md](docs/Curso-Completo-Agent-DID-SDK.md)
 - 2-hour practical course: [docs/RFC-001-2h-Practical-Course.md](docs/RFC-001-2h-Practical-Course.md)
 - Training manual: [docs/RFC-001-Training-Manual.md](docs/RFC-001-Training-Manual.md)
+- Strategic assessment & roadmap: [_bmad-output/planning-artifacts/Strategic-Assessment-Agent-DID.md](_bmad-output/planning-artifacts/Strategic-Assessment-Agent-DID.md)
 - Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Roadmap
@@ -86,8 +88,8 @@ RFC-001 is implemented and fully conformant. The project follows a 3-phase roadm
 
 | # | Item | Status |
 |---|---|---|
-| F1-01 | Publish SDK to npm (`@agent-did/sdk`) | ✅ Done |
-| F1-02 | Translate all docs to English | ✅ Done |
+| F1-01 | Publish SDK to npm (`@agent-did/sdk`) | Open |
+| F1-02 | Translate all docs to English | Partial |
 | F1-03 | LangChain plugin for Agent-DID identity | Open |
 | F1-04 | Submit RFC-001 to DIF | Open |
 | F1-05 | Automated smart contract audit (Slither/Mythril) | Open |
@@ -100,9 +102,11 @@ RFC-001 is implemented and fully conformant. The project follows a 3-phase roadm
 | F2-01 | Python SDK with feature parity | Open |
 | F2-02 | Google A2A proof-of-concept | Open |
 | F2-03 | Production resolver (IPFS/Arweave + HTTP) | Open |
-| F2-04 | CrewAI and AutoGen plugins | Open |
-| F2-05 | Public testnet deployment | Open |
-| F2-06 | Formal whitepaper publication | Open |
+| F2-04 | Microsoft Agent Framework (Semantic Kernel) plugin | Open |
+| F2-05 | CrewAI plugin | Open |
+| F2-06 | Public testnet deployment | Open |
+| F2-07 | Formal whitepaper publication | Open |
+| F2-08 | Azure AI Agent Service integration | Open |
 
 ### Phase 3 — Maturity & Standardization (6-12 months)
 
