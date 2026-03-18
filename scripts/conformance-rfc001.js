@@ -110,6 +110,19 @@ function main() {
   const technicalChecksFailed = checkResults.some((check) => !check.ok);
   const mustFailed = mustSummary.fail > 0;
 
+  if (technicalChecksFailed) {
+    const failedNames = checkResults.filter((c) => !c.ok).map((c) => c.name);
+    console.error(`\n[conformance] Technical checks failed: ${failedNames.join(', ')}`);
+  }
+
+  if (mustSummary.unknown > 0) {
+    console.warn(`[conformance] ${mustSummary.unknown} MUST controls have UNKNOWN status — verify manually.`);
+  }
+
+  if (shouldSummary.unknown > 0) {
+    console.warn(`[conformance] ${shouldSummary.unknown} SHOULD controls have UNKNOWN status — verify manually.`);
+  }
+
   if (technicalChecksFailed || mustFailed) {
     console.error('\n❌ RFC-001 conformance FAILED');
     if (technicalChecksFailed) {

@@ -1,0 +1,45 @@
+{
+  "slither": [
+    {
+      "ruleId": "slither-weak-prng-tostring",
+      "check": "weak-prng",
+      "locations": ["share/contracts/src/AgentRegistry.sol#L135-L155"],
+      "classification": "false-positive",
+      "rationale": "Modulo arithmetic in _toString is decimal conversion, not entropy or randomness."
+    },
+    {
+      "ruleId": "slither-incorrect-equality-tostring",
+      "check": "incorrect-equality",
+      "locations": ["share/contracts/src/AgentRegistry.sol#L135-L155"],
+      "classification": "false-positive",
+      "rationale": "Strict equality in _toString is deterministic integer formatting logic."
+    },
+    {
+      "ruleId": "slither-timestamp-metadata-paths",
+      "check": "timestamp",
+      "locations": [
+        "share/contracts/src/AgentRegistry.sol#L23-L41",
+        "share/contracts/src/AgentRegistry.sol#L43-L54",
+        "share/contracts/src/AgentRegistry.sol#L56-L65",
+        "share/contracts/src/AgentRegistry.sol#L67-L78",
+        "share/contracts/src/AgentRegistry.sol#L84-L92",
+        "share/contracts/src/AgentRegistry.sol#L94-L115",
+        "share/contracts/src/AgentRegistry.sol#L117-L124",
+        "share/contracts/src/AgentRegistry.sol#L130-L133",
+        "share/contracts/src/AgentRegistry.sol#L135-L155"
+      ],
+      "classification": "accepted-low-risk",
+      "rationale": "Current timestamp usage is limited to metadata serialization and presence checks, not economic or privilege-sensitive timing."
+    }
+  ],
+  "mythril": [
+    {
+      "ruleId": "mythril-swc116-known-sourcemaps",
+      "swcID": "SWC-116",
+      "severity": "Low",
+      "sourceMaps": ["6220:1:2", "6294:1:2", "6416:1:2", "10214:1:2"],
+      "classification": "accepted-low-risk",
+      "rationale": "Known low-severity timestamp dependence findings map to current metadata-only timestamp usage."
+    }
+  ]
+}

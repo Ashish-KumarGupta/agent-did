@@ -43,6 +43,12 @@ export class HttpDIDDocumentSource implements DIDDocumentSource {
 
     for (const url of urls) {
       try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+          errors.push(`${url}: unsupported protocol ${parsed.protocol}`);
+          continue;
+        }
+
         const response = await this.fetchFn(url);
 
         if (response.ok) {

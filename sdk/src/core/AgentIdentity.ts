@@ -164,6 +164,10 @@ export class AgentIdentity {
       throw new Error("HTTP URL is required");
     }
 
+    if (!params.agentDid?.trim()) {
+      throw new Error("Agent DID is required");
+    }
+
     const urlObj = new URL(params.url);
     const timestamp = Math.floor(Date.now() / 1000).toString();
     const dateHeader = new Date().toUTCString();
@@ -268,7 +272,7 @@ export class AgentIdentity {
 
   /**
    * Verifies that a signature was produced by a specific Agent-DID.
-   * (Placeholder for future implementation using the Universal Resolver)
+   * Uses the configured resolver and registry to validate against active verification methods.
    */
   public static async verifySignature(did: string, payload: string, signature: string, keyId?: string): Promise<boolean> {
     const isRevoked = await AgentIdentity.registry.isRevoked(did);
@@ -295,15 +299,20 @@ export class AgentIdentity {
     });
 
     for (const verificationMethod of candidateMethods) {
-      const publicKeyHex = verificationMethod.publicKeyMultibase!.startsWith('z')
-        ? verificationMethod.publicKeyMultibase!.slice(1)
-        : verificationMethod.publicKeyMultibase!;
+      const keyValue = verificationMethod.publicKeyMultibase;
+      if (!keyValue) continue;
 
-      const publicKeyBytes = hexToBytes(publicKeyHex);
-      const valid = ed25519.verify(signatureBytes, messageBytes, publicKeyBytes);
+      const publicKeyHex = keyValue.startsWith('z') ? keyValue.slice(1) : keyValue;
 
-      if (valid) {
-        return true;
+      try {
+        const publicKeyBytes = hexToBytes(publicKeyHex);
+        const valid = ed25519.verify(signatureBytes, messageBytes, publicKeyBytes);
+
+        if (valid) {
+          return true;
+        }
+      } catch {
+        continue;
       }
     }
 
@@ -312,7 +321,7 @@ export class AgentIdentity {
 
   /**
    * Resolves a DID into its corresponding Agent-DID Document.
-   * (Placeholder for future implementation using the Universal Resolver)
+   * Uses the configured resolver (in-memory or production) to retrieve the document.
    */
   public static async resolve(did: string): Promise<AgentDIDDocument> {
     const isRevoked = await AgentIdentity.registry.isRevoked(did);
@@ -552,7 +561,7 @@ export class AgentIdentity {
     const parsed = new Map<string, string>();
 
     for (const entry of entries) {
-      const match = entry.match(/^([a-zA-Z0-9_-]+)=:(.+):$/);
+      const match = entry.match(/^([a-zA-Z0-9_-]+)=:([A-Za-z0-9+/=]+):$/);
       if (!match) {
         continue;
       }

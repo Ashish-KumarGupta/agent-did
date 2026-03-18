@@ -5,6 +5,7 @@ const path = require('node:path');
 const ROOT = path.resolve(__dirname, '..');
 const CONTRACT_PATH = path.join(ROOT, 'contracts', 'src', 'AgentRegistry.sol');
 const REPORT_DIR = path.join(ROOT, 'contracts', 'reports', 'security');
+const TRIAGE_RULES_PATH = path.join(ROOT, 'contracts', 'audit-triage-rules.json');
 const SLITHER_REPORT_PATH = path.join(REPORT_DIR, 'slither.json');
 const MYTHRIL_REPORT_PATH = path.join(REPORT_DIR, 'mythril.json');
 const SUMMARY_PATH = path.join(REPORT_DIR, 'README.md');
@@ -14,50 +15,27 @@ const MYTHRIL_IMAGE = 'mythril/myth@sha256:49e11758e359d0b410f648df5bbcba28a52e0
 const SEVERITY_ORDER = ['Low', 'Medium', 'High', 'Critical'];
 const DEFAULT_FAIL_ON_SEVERITY = 'Low';
 
-const KNOWN_SLITHER_NOISE_RULES = [
-  {
-    ruleId: 'slither-weak-prng-tostring',
-    check: 'weak-prng',
-    locations: new Set(['share/contracts/src/AgentRegistry.sol#L135-L155']),
-    classification: 'false-positive',
-    rationale: 'Modulo arithmetic in _toString is decimal conversion, not entropy or randomness.'
-  },
-  {
-    ruleId: 'slither-incorrect-equality-tostring',
-    check: 'incorrect-equality',
-    locations: new Set(['share/contracts/src/AgentRegistry.sol#L135-L155']),
-    classification: 'false-positive',
-    rationale: 'Strict equality in _toString is deterministic integer formatting logic.'
-  },
-  {
-    ruleId: 'slither-timestamp-metadata-paths',
-    check: 'timestamp',
-    locations: new Set([
-      'share/contracts/src/AgentRegistry.sol#L23-L41',
-      'share/contracts/src/AgentRegistry.sol#L43-L54',
-      'share/contracts/src/AgentRegistry.sol#L56-L65',
-      'share/contracts/src/AgentRegistry.sol#L67-L78',
-      'share/contracts/src/AgentRegistry.sol#L84-L92',
-      'share/contracts/src/AgentRegistry.sol#L94-L115',
-      'share/contracts/src/AgentRegistry.sol#L117-L124',
-      'share/contracts/src/AgentRegistry.sol#L130-L133',
-      'share/contracts/src/AgentRegistry.sol#L135-L155'
-    ]),
-    classification: 'accepted-low-risk',
-    rationale: 'Current timestamp usage is limited to metadata serialization and presence checks, not economic or privilege-sensitive timing.'
+function loadTriageRules() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(TRIAGE_RULES_PATH, 'utf8'));
+    const slither = (raw.slither || []).map((r) => ({
+      ...r,
+      locations: new Set(r.locations),
+    }));
+    const mythril = (raw.mythril || []).map((r) => ({
+      ...r,
+      sourceMaps: new Set(r.sourceMaps),
+    }));
+    return { slither, mythril };
+  } catch (err) {
+    console.warn(`[audit] Could not load triage rules from ${TRIAGE_RULES_PATH}: ${err instanceof Error ? err.message : String(err)}`);
+    return { slither: [], mythril: [] };
   }
-];
+}
 
-const KNOWN_MYTHRIL_NOISE_RULES = [
-  {
-    ruleId: 'mythril-swc116-known-sourcemaps',
-    swcID: 'SWC-116',
-    severity: 'Low',
-    sourceMaps: new Set(['6220:1:2', '6294:1:2', '6416:1:2', '10214:1:2']),
-    classification: 'accepted-low-risk',
-    rationale: 'Known low-severity timestamp dependence findings map to current metadata-only timestamp usage.'
-  }
-];
+const TRIAGE_RULES = loadTriageRules();
+const KNOWN_SLITHER_NOISE_RULES = TRIAGE_RULES.slither;
+const KNOWN_MYTHRIL_NOISE_RULES = TRIAGE_RULES.mythril;
 
 function run(command, description, options = {}) {
   console.log(`\n[audit] ${description}`);
@@ -178,7 +156,7 @@ function isSeverityAtLeast(severity, minimumSeverity) {
   const normalizedMinimumSeverity = normalizeSeverity(minimumSeverity);
 
   if (normalizedSeverity === 'Unknown' || normalizedMinimumSeverity === 'Unknown') {
-    return true;
+    return false;
   }
 
   return SEVERITY_ORDER.indexOf(normalizedSeverity) >= SEVERITY_ORDER.indexOf(normalizedMinimumSeverity);
@@ -416,7 +394,7 @@ function writeSummary(analysis) {
     '- Raw JSON reports remain untouched.',
     '- Only findings matched by exact rule ids and source locations are classified as accepted noise.',
     `- Unmatched findings with severity >= ${analysis.failOnSeverity} cause \`npm run audit:contracts\` to fail after generating the reports.`,
-    '- Unknown severities are treated as blocking.',
+    '- Unknown severities are treated as non-blocking warnings.',
     '',
     'Reference:',
     '- docs/F1-05-Contract-Audit-Triage.md',

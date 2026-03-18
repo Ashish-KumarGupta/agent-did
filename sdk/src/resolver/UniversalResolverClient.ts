@@ -39,7 +39,9 @@ export class UniversalResolverClient implements DIDResolver {
 
     if (this.documentSource.storeByReference) {
       const documentRef = this.computeDocumentReference(document);
-      void this.documentSource.storeByReference(documentRef, this.clone(document));
+      this.documentSource.storeByReference(documentRef, this.clone(document)).catch(() => {
+        // Non-critical: cache is already updated, external store failure is tolerable
+      });
     }
   }
 

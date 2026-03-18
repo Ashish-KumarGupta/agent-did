@@ -1,39 +1,5 @@
-const http = require('http');
 const path = require('path');
-
-const ROOT = path.resolve(__dirname, '..');
-const SDK_DIST = path.join(ROOT, 'sdk', 'dist');
-
-function createRpcServer(handler) {
-  const server = http.createServer((req, res) => {
-    if (req.method !== 'POST') {
-      res.writeHead(405, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ error: 'method not allowed' }));
-      return;
-    }
-
-    const chunks = [];
-    req.on('data', (chunk) => chunks.push(chunk));
-    req.on('end', async () => {
-      try {
-        const payload = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
-        const response = await handler(payload);
-        res.writeHead(response.httpStatus || 200, { 'content-type': 'application/json' });
-        res.end(JSON.stringify(response.payload));
-      } catch (error) {
-        res.writeHead(500, { 'content-type': 'application/json' });
-        res.end(JSON.stringify({ jsonrpc: '2.0', id: null, error: { code: -32000, message: String(error) } }));
-      }
-    });
-  });
-
-  return {
-    start: () => new Promise((resolve) => {
-      server.listen(0, '127.0.0.1', () => resolve(server.address().port));
-    }),
-    stop: () => new Promise((resolve) => server.close(() => resolve()))
-  };
-}
+const { SDK_DIST, createJsonRpcServer } = require('./smoke-utils');
 
 async function main() {
   let sdk;
@@ -70,16 +36,16 @@ async function main() {
     authentication: [`${did}#key-1`]
   };
 
-  const primaryDown = createRpcServer(async (payload) => ({
+  const primaryDown = createJsonRpcServer(async (payload) => ({
     httpStatus: 503,
     payload: { jsonrpc: '2.0', id: payload.id ?? null, error: { code: -32000, message: 'primary down' } }
   }));
 
-  const secondaryNotFound = createRpcServer(async (payload) => ({
+  const secondaryNotFound = createJsonRpcServer(async (payload) => ({
     payload: { jsonrpc: '2.0', id: payload.id ?? null, error: { code: -32004, message: 'not found on secondary' } }
   }));
 
-  const tertiaryHealthy = createRpcServer(async (payload) => {
+  const tertiaryHealthy = createJsonRpcServer(async (payload) => {
     if (payload.method !== 'agent_resolveDocumentRef') {
       return { payload: { jsonrpc: '2.0', id: payload.id ?? null, error: { code: -32601, message: 'method not found' } } };
     }

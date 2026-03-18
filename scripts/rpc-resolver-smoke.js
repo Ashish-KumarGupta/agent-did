@@ -1,47 +1,5 @@
-const http = require('http');
 const path = require('path');
-
-const ROOT = path.resolve(__dirname, '..');
-const SDK_DIST = path.join(ROOT, 'sdk', 'dist');
-
-function createJsonRpcServer(handler) {
-  const server = http.createServer(async (req, res) => {
-    if (req.method !== 'POST') {
-      res.writeHead(405, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ error: 'method not allowed' }));
-      return;
-    }
-
-    const chunks = [];
-    req.on('data', (chunk) => chunks.push(chunk));
-    req.on('end', async () => {
-      try {
-        const body = Buffer.concat(chunks).toString('utf8') || '{}';
-        const payload = JSON.parse(body);
-        const responseBody = await handler(payload);
-        res.writeHead(responseBody.httpStatus || 200, { 'content-type': 'application/json' });
-        res.end(JSON.stringify(responseBody.payload));
-      } catch (error) {
-        res.writeHead(500, { 'content-type': 'application/json' });
-        res.end(JSON.stringify({
-          jsonrpc: '2.0',
-          id: null,
-          error: { code: -32000, message: error instanceof Error ? error.message : String(error) }
-        }));
-      }
-    });
-  });
-
-  return {
-    start: () => new Promise((resolve) => {
-      server.listen(0, '127.0.0.1', () => {
-        const address = server.address();
-        resolve(Number(address.port));
-      });
-    }),
-    stop: () => new Promise((resolve) => server.close(() => resolve()))
-  };
-}
+const { SDK_DIST, createJsonRpcServer } = require('./smoke-utils');
 
 async function main() {
   let sdk;

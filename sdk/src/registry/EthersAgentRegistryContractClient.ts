@@ -63,16 +63,24 @@ export class EthersAgentRegistryContractClient implements EvmAgentRegistryContra
       };
     }
 
-    return {
-      did: String((rawRecord as AgentRegistryRecord).did),
-      controller: String((rawRecord as AgentRegistryRecord).controller),
-      createdAt: normalizeTimestampToIso(String((rawRecord as AgentRegistryRecord).createdAt))
-        || String((rawRecord as AgentRegistryRecord).createdAt),
-      revokedAt: normalizeTimestampToIso((rawRecord as AgentRegistryRecord).revokedAt),
-      documentRef: (rawRecord as AgentRegistryRecord).documentRef
-        ? String((rawRecord as AgentRegistryRecord).documentRef)
-        : undefined
-    };
+    const record = rawRecord as unknown as Record<string, unknown>;
+    if (
+      record &&
+      typeof record === 'object' &&
+      typeof record.did === 'string' &&
+      typeof record.controller === 'string'
+    ) {
+      return {
+        did: String(record.did),
+        controller: String(record.controller),
+        createdAt: normalizeTimestampToIso(String(record.createdAt ?? ''))
+          || String(record.createdAt ?? ''),
+        revokedAt: normalizeTimestampToIso(String(record.revokedAt ?? '')),
+        documentRef: record.documentRef ? String(record.documentRef) : undefined
+      };
+    }
+
+    throw new Error(`Invalid contract response format for getAgentRecord`);
   }
 
   public async isRevoked(did: string): Promise<boolean> {

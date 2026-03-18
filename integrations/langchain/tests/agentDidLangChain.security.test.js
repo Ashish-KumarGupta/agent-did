@@ -1,0 +1,80 @@
+const { ethers } = require("ethers");
+const { AgentIdentity, InMemoryAgentRegistry } = require("@agent-did/sdk");
+const { createAgentDidTools } = require("../src");
+
+describe("@agent-did/langchain security edge cases", () => {
+  const signer = ethers.Wallet.createRandom();
+  const agentIdentity = new AgentIdentity({ signer, network: "polygon" });
+
+  beforeAll(() => {
+    AgentIdentity.setRegistry(new InMemoryAgentRegistry());
+  });
+
+  it("sign_http_request rejects non-http/https URLs", async () => {
+    const runtimeIdentity = await agentIdentity.create({
+      name: "SSRFTestBot",
+      coreModel: "test",
+      systemPrompt: "test",
+    });
+
+    const tools = createAgentDidTools({
+      agentIdentity,
+      runtimeIdentity,
+      expose: { signHttp: true },
+    });
+
+    const signHttp = tools.find((t) => t.name.includes("sign_http_request"));
+    expect(signHttp).toBeDefined();
+
+    const result = await signHttp.invoke({
+      method: "GET",
+      url: "file:///etc/passwd",
+    });
+
+    expect(result.error).toBeDefined();
+    expect(result.error).toContain("http");
+  });
+
+  it("tools return structured error on SDK failure instead of throwing", async () => {
+    const runtimeIdentity = await agentIdentity.create({
+      name: "ErrorTestBot",
+      coreModel: "test",
+      systemPrompt: "test",
+    });
+
+    const tools = createAgentDidTools({
+      agentIdentity,
+      runtimeIdentity,
+      expose: { resolveDid: true },
+    });
+
+    const resolveTool = tools.find((t) => t.name.includes("resolve_did"));
+    const result = await resolveTool.invoke({ did: "did:agent:polygon:0xnonexistent" });
+
+    expect(result.error).toBeDefined();
+  });
+
+  it("verify_signature handles malformed inputs gracefully", async () => {
+    const runtimeIdentity = await agentIdentity.create({
+      name: "MalformedInputBot",
+      coreModel: "test",
+      systemPrompt: "test",
+    });
+
+    const tools = createAgentDidTools({
+      agentIdentity,
+      runtimeIdentity,
+      expose: { verifySignatures: true },
+    });
+
+    const verifyTool = tools.find((t) => t.name.includes("verify_signature"));
+
+    const result = await verifyTool.invoke({
+      payload: "test",
+      signature: "not-a-valid-hex-signature",
+    });
+
+    // Should either return error or isValid false, not throw
+    expect(result.error || result.isValid === false).toBeTruthy();
+  });
+});

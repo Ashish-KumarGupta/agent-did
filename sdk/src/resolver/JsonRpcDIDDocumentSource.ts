@@ -60,9 +60,17 @@ export class JsonRpcDIDDocumentSource implements DIDDocumentSource {
     });
 
     const errors: string[] = [];
+    let hadValidEndpoint = false;
 
     for (const endpoint of this.endpoints) {
       try {
+        const parsed = new URL(endpoint);
+        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+          continue;
+        }
+
+        hadValidEndpoint = true;
+
         const response = await this.transport(endpoint, payload, this.headers);
 
         if (!response.ok) {
@@ -92,7 +100,7 @@ export class JsonRpcDIDDocumentSource implements DIDDocumentSource {
       }
     }
 
-    if (errors.length === 0) {
+    if (errors.length === 0 || !hadValidEndpoint) {
       return null;
     }
 
