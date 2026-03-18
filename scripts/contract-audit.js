@@ -432,8 +432,6 @@ function main() {
   const dockerMount = `"${ROOT}:/share"`;
   const contractInContainer = '/share/contracts/src/AgentRegistry.sol';
   const slitherReportInContainer = '/share/contracts/reports/security/slither.json';
-  const mythrilReportInContainer = '/share/contracts/reports/security/mythril.json';
-
   run(
     `docker run --rm -v ${dockerMount} trailofbits/eth-security-toolbox /bin/bash -lc "solc-select install ${SOLC_VERSION} && solc-select use ${SOLC_VERSION} && slither ${contractInContainer} --exclude-dependencies --json ${slitherReportInContainer}"`,
     'Running Slither static analysis',
@@ -441,7 +439,7 @@ function main() {
   );
 
   run(
-    `docker run --rm -v ${dockerMount} --entrypoint /bin/sh mythril/myth -lc "myth analyze ${contractInContainer} --solv ${SOLC_VERSION} --execution-timeout 180 -o jsonv2 > ${mythrilReportInContainer}"`,
+    `docker run --rm -v ${dockerMount} --entrypoint /bin/sh mythril/myth -lc "myth analyze ${contractInContainer} --solv ${SOLC_VERSION} --execution-timeout 180 -o jsonv2" > "${MYTHRIL_REPORT_PATH}"`,
     'Running Mythril symbolic analysis',
     { reportPath: MYTHRIL_REPORT_PATH }
   );
