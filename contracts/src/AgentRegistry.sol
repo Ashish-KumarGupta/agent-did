@@ -18,7 +18,7 @@ contract AgentRegistry {
 
     mapping(string => AgentRecord) private records;
 
-    address public admin;
+    address public immutable admin;
     bool public paused;
 
     event AgentRegistered(string did, string controller, string createdAt, address indexed owner);

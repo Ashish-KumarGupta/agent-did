@@ -241,7 +241,7 @@ function classifyMythrilFindings(issues) {
       (candidate) =>
         candidate.swcID === issue.swcID &&
         candidate.severity === issue.severity &&
-        candidate.sourceMaps.has(sourceMap)
+        (candidate.sourceMaps.has('*') || candidate.sourceMaps.has(sourceMap))
     );
 
     const finding = {
