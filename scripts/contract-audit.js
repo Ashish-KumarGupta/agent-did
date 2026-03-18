@@ -9,6 +9,8 @@ const SLITHER_REPORT_PATH = path.join(REPORT_DIR, 'slither.json');
 const MYTHRIL_REPORT_PATH = path.join(REPORT_DIR, 'mythril.json');
 const SUMMARY_PATH = path.join(REPORT_DIR, 'README.md');
 const SOLC_VERSION = '0.8.24';
+const SLITHER_IMAGE = 'trailofbits/eth-security-toolbox@sha256:365282b8d03ab03f387fefadbcf3858e82d967597e90a17cf4879b3efb475764';
+const MYTHRIL_IMAGE = 'mythril/myth@sha256:49e11758e359d0b410f648df5bbcba28a52e091a78e4772b5c02b9043666b4ff';
 const SEVERITY_ORDER = ['Low', 'Medium', 'High', 'Critical'];
 const DEFAULT_FAIL_ON_SEVERITY = 'Low';
 
@@ -433,13 +435,13 @@ function main() {
   const contractInContainer = '/share/contracts/src/AgentRegistry.sol';
   const slitherReportInContainer = '/share/contracts/reports/security/slither.json';
   run(
-    `docker run --rm -v ${dockerMount} trailofbits/eth-security-toolbox /bin/bash -lc "solc-select install ${SOLC_VERSION} && solc-select use ${SOLC_VERSION} && slither ${contractInContainer} --exclude-dependencies --json ${slitherReportInContainer}"`,
+    `docker run --rm -v ${dockerMount} ${SLITHER_IMAGE} /bin/bash -lc "solc-select install ${SOLC_VERSION} && solc-select use ${SOLC_VERSION} && slither ${contractInContainer} --exclude-dependencies --json ${slitherReportInContainer}"`,
     'Running Slither static analysis',
     { reportPath: SLITHER_REPORT_PATH }
   );
 
   run(
-    `docker run --rm -v ${dockerMount} --entrypoint /bin/sh mythril/myth -lc "myth analyze ${contractInContainer} --solv ${SOLC_VERSION} --execution-timeout 180 -o jsonv2" > "${MYTHRIL_REPORT_PATH}"`,
+    `docker run --rm -v ${dockerMount} --entrypoint /bin/sh ${MYTHRIL_IMAGE} -lc "myth analyze ${contractInContainer} --solv ${SOLC_VERSION} --execution-timeout 180 -o jsonv2" > "${MYTHRIL_REPORT_PATH}"`,
     'Running Mythril symbolic analysis',
     { reportPath: MYTHRIL_REPORT_PATH }
   );
