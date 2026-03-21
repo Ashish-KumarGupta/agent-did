@@ -26,12 +26,12 @@ class AgentDidIdentitySnapshot(BaseModel):
 
 
 def get_active_authentication_key_id(runtime_identity: RuntimeIdentity) -> str | None:
-    verification_method_id = getattr(runtime_identity, "verification_method_id", None)
-    if verification_method_id:
-        return verification_method_id
+    if isinstance(runtime_identity, RotateVerificationMethodResult):
+        return runtime_identity.verification_method_id
 
     authentication = runtime_identity.document.authentication
-    return authentication[0] if authentication else None
+    first_authentication_method: str | None = authentication[0] if authentication else None
+    return first_authentication_method
 
 
 def build_agent_did_identity_snapshot(runtime_identity: RuntimeIdentity) -> AgentDidIdentitySnapshot:
