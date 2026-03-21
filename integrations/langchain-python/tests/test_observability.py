@@ -239,3 +239,53 @@ def test_langsmith_event_handler_creates_chain_run_for_snapshot_event() -> None:
     assert child_run.name == "agent_did.identity_snapshot.refreshed"
     assert child_run.run_type == "chain"
     assert child_run.outputs["attributes"]["reason"] == "compose_system_prompt"
+
+
+def test_compose_event_handlers_can_fan_out_to_json_logger_and_langsmith() -> None:
+    stream = io.StringIO()
+    logger = logging.getLogger("agent_did_langchain.tests.composed")
+    logger.handlers.clear()
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    logger.addHandler(logging.StreamHandler(stream))
+
+    root_run = create_langsmith_run_tree(name="agent_did_composed_root")
+    captured_events: list[AgentDidObservabilityEvent] = []
+    handler = compose_event_handlers(
+        captured_events.append,
+        create_json_logger_event_handler(logger, include_timestamp=False, extra_fields={"sink": "json"}),
+        create_langsmith_event_handler(root_run, include_timestamp=False, extra_fields={"sink": "langsmith"}),
+    )
+
+    handler(
+        AgentDidObservabilityEvent(
+            event_type="agent_did.tool.started",
+            attributes={
+                "tool_name": "agent_did_sign_http_request",
+                "did": "did:agent:test:compose",
+                "inputs": {"url": "https://api.example.com/compose?debug=true", "body": "secret-payload"},
+            },
+        )
+    )
+    handler(
+        AgentDidObservabilityEvent(
+            event_type="agent_did.tool.succeeded",
+            attributes={
+                "tool_name": "agent_did_sign_http_request",
+                "did": "did:agent:test:compose",
+                "outputs": {"header_names": ["Signature", "Signature-Input"]},
+            },
+        )
+    )
+
+    record = json.loads(stream.getvalue().splitlines()[0])
+
+    assert len(captured_events) == 2
+    assert record["sink"] == "json"
+    assert record["attributes"]["inputs"]["url"] == "https://api.example.com/compose"
+    assert record["attributes"]["inputs"]["body"] == {"redacted": True, "length": 14}
+    assert len(root_run.child_runs) == 1
+    assert root_run.child_runs[0].outputs["attributes"]["outputs"]["header_names"] == [
+        "Signature",
+        "Signature-Input",
+    ]
