@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+import io
+import json
+import logging
+
 import pytest
 from agent_did_sdk import AgentIdentity, AgentIdentityConfig, CreateAgentParams, InMemoryAgentRegistry
 
 from agent_did_langchain import create_agent_did_langchain_integration
-from agent_did_langchain.observability import AgentDidObservabilityEvent
+from agent_did_langchain.observability import (
+    AgentDidObservabilityEvent,
+    compose_event_handlers,
+    create_json_logger_event_handler,
+)
 
 
 @pytest.mark.asyncio
@@ -122,3 +130,47 @@ async def test_tool_failure_event_emits_sanitized_error_context() -> None:
     assert failed_event.attributes["inputs"]["body"] == {"redacted": True, "length": 12}
     assert failed_event.attributes["inputs"]["url"] == "file:///tmp/secret"
     assert "http" in failed_event.attributes["error"].lower()
+
+
+def test_compose_event_handlers_fans_out_to_all_handlers() -> None:
+    received_a: list[AgentDidObservabilityEvent] = []
+    received_b: list[AgentDidObservabilityEvent] = []
+    handler = compose_event_handlers(received_a.append, None, received_b.append)
+
+    event = AgentDidObservabilityEvent(event_type="agent_did.tool.started", attributes={"payload": "secret"})
+    handler(event)
+
+    assert len(received_a) == 1
+    assert len(received_b) == 1
+    assert received_a[0].attributes["payload"] == "secret"
+
+
+def test_json_logger_event_handler_emits_structured_sanitized_payload() -> None:
+    stream = io.StringIO()
+    logger = logging.getLogger("agent_did_langchain.tests.json")
+    logger.handlers.clear()
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    logger.addHandler(logging.StreamHandler(stream))
+
+    handler = create_json_logger_event_handler(
+        logger,
+        include_timestamp=False,
+        extra_fields={"component": "tests", "payload": "should-redact"},
+    )
+    handler(
+        AgentDidObservabilityEvent(
+            event_type="agent_did.tool.started",
+            level="info",
+            attributes={"payload": {"redacted": True, "length": 4}, "url": "https://api.example.com/path?q=1"},
+        )
+    )
+
+    record = json.loads(stream.getvalue().strip())
+
+    assert record["source"] == "agent_did_langchain"
+    assert record["event_type"] == "agent_did.tool.started"
+    assert record["attributes"]["payload"] == {"redacted": True, "length": 4}
+    assert record["attributes"]["url"] == "https://api.example.com/path"
+    assert record["component"] == "tests"
+    assert record["payload"] == {"redacted": True, "length": 13}

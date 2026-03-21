@@ -96,6 +96,33 @@ Redaccion por defecto:
 
 Esto permite conectar LangSmith, logging estructurado, trazas locales o callbacks propios sin exponer material sensible por defecto.
 
+Si quiere reutilizar adaptadores listos para usar sin cambiar la API base, el paquete ahora expone:
+
+- `compose_event_handlers(...)`: combina varios sinks/callbacks en un solo `observability_handler`.
+- `create_json_logger_event_handler(logger, ...)`: emite cada evento como un registro JSON saneado, apto para pipelines de logging estructurado.
+- `serialize_observability_event(...)`: convierte un evento en un diccionario serializable para integrarlo con otros sistemas.
+
+Ejemplo de logging JSON estructurado:
+
+```python
+import logging
+
+from agent_did_langchain import create_agent_did_langchain_integration
+from agent_did_langchain.observability import create_json_logger_event_handler
+
+logger = logging.getLogger("agent_did_langchain.json")
+
+integration = create_agent_did_langchain_integration(
+    agent_identity=agent_identity,
+    runtime_identity=runtime_identity,
+    expose={"sign_http": True},
+    observability_handler=create_json_logger_event_handler(
+        logger,
+        extra_fields={"service": "agent-gateway", "environment": "dev"},
+    ),
+)
+```
+
 ## Hallazgos tecnicos confirmados
 
 La documentacion publica actual de LangChain Python confirma al menos estas superficies utiles:
@@ -191,6 +218,7 @@ El plan tecnico cerrado por archivos, versiones objetivo y criterios de aceptaci
 - `examples/agent_did_langchain_example.py`: ensamblaje base, tool calls directos y opcion de demo con modelo real usando `RUN_LANGCHAIN_MODEL_EXAMPLE=1`.
 - `examples/agent_did_langchain_observability_example.py`: muestra eventos estructurados y la redaccion aplicada a inputs sensibles.
 - `examples/agent_did_langchain_secure_http_example.py`: firma HTTP, devuelve headers verificables y valida la firma con el SDK Python.
+- `examples/agent_did_langchain_json_logging_example.py`: emite eventos saneados como logs JSON listos para agregacion.
 
 ## Troubleshooting rapido
 

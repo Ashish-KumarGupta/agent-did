@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
@@ -36,6 +38,64 @@ class AgentDidObservabilityEvent:
 
 
 AgentDidEventHandler = Callable[[AgentDidObservabilityEvent], None]
+
+
+def compose_event_handlers(*handlers: AgentDidEventHandler | None) -> AgentDidEventHandler:
+    """Fan out a sanitized event to multiple handlers."""
+
+    active_handlers = [handler for handler in handlers if handler is not None]
+
+    def composite_handler(event: AgentDidObservabilityEvent) -> None:
+        for handler in active_handlers:
+            try:
+                handler(event)
+            except Exception:
+                continue
+
+    return composite_handler
+
+
+def serialize_observability_event(
+    event: AgentDidObservabilityEvent,
+    *,
+    source: str = "agent_did_langchain",
+    include_timestamp: bool = True,
+    extra_fields: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Convert an event into a JSON-serializable structured record."""
+
+    record: dict[str, Any] = {
+        "source": source,
+        "event_type": event.event_type,
+        "level": event.level,
+        "attributes": sanitize_observability_attributes(event.attributes),
+    }
+    if include_timestamp:
+        record["timestamp"] = datetime.now(UTC).isoformat()
+    if extra_fields:
+        record.update(sanitize_observability_attributes(extra_fields))
+    return record
+
+
+def create_json_logger_event_handler(
+    logger: logging.Logger,
+    *,
+    source: str = "agent_did_langchain",
+    include_timestamp: bool = True,
+    extra_fields: Mapping[str, Any] | None = None,
+) -> AgentDidEventHandler:
+    """Create an event handler that writes sanitized JSON records to a logger."""
+
+    def log_event(event: AgentDidObservabilityEvent) -> None:
+        record = serialize_observability_event(
+            event,
+            source=source,
+            include_timestamp=include_timestamp,
+            extra_fields=extra_fields,
+        )
+        logger.log(_to_logging_level(event.level), json.dumps(record, sort_keys=True))
+
+    return log_event
 
 
 def sanitize_observability_attributes(attributes: Mapping[str, Any]) -> dict[str, Any]:
