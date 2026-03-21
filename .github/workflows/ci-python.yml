@@ -7,10 +7,12 @@ on:
       - main
     paths:
       - "sdk-python/**"
+      - "contracts/**"
       - ".github/workflows/ci-python.yml"
   pull_request:
     paths:
       - "sdk-python/**"
+      - "contracts/**"
       - ".github/workflows/ci-python.yml"
   workflow_dispatch:
 
@@ -37,15 +39,27 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Setup Node.js
+        if: matrix.python-version == '3.12'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+
       - name: Install SDK in dev mode
         working-directory: sdk-python
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
+      - name: Install contract dependencies
+        if: matrix.python-version == '3.12'
+        run: npm --prefix contracts ci
+
       - name: Lint with ruff
         working-directory: sdk-python
-        run: ruff check src/ tests/
+        run: ruff check src/ tests/ scripts/
 
       - name: Type check with mypy
         working-directory: sdk-python
@@ -66,3 +80,23 @@ jobs:
         if: matrix.python-version == '3.12'
         working-directory: sdk-python
         run: python scripts/conformance_rfc001.py
+
+      - name: Run Python RPC smoke
+        if: matrix.python-version == '3.12'
+        working-directory: sdk-python
+        run: python scripts/rpc_resolver_smoke.py
+
+      - name: Run Python HA smoke
+        if: matrix.python-version == '3.12'
+        working-directory: sdk-python
+        run: python scripts/resolver_ha_smoke.py
+
+      - name: Run Python revocation policy smoke
+        if: matrix.python-version == '3.12'
+        working-directory: sdk-python
+        run: python scripts/revocation_policy_smoke.py
+
+      - name: Run Python E2E smoke
+        if: matrix.python-version == '3.12'
+        working-directory: sdk-python
+        run: python scripts/e2e_smoke.py
