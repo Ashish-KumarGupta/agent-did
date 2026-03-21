@@ -87,15 +87,15 @@ function main() {
   for (const check of checks) {
     console.log(`\\n[conformance] ${check.name}`);
     const result = run(check.cmd);
-    checkResults.push({ ...check, ...result });
-    if (!result.ok) {
-      if (check.optional) {
-        console.warn(`[conformance] SKIPPED (optional): ${check.name}`);
-        result.skipped = true;
-      } else {
-        console.error(`[conformance] FAILED: ${check.name}`);
-        break;
-      }
+    if (!result.ok && check.optional) {
+      console.warn(`[conformance] SKIPPED (optional): ${check.name}`);
+      checkResults.push({ ...check, ...result, skipped: true });
+    } else if (!result.ok) {
+      checkResults.push({ ...check, ...result });
+      console.error(`[conformance] FAILED: ${check.name}`);
+      break;
+    } else {
+      checkResults.push({ ...check, ...result });
     }
   }
 
