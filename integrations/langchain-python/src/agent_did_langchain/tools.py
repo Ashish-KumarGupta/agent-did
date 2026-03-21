@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ipaddress import ip_address
-from typing import Any
+from typing import Any, Protocol
 from urllib.parse import urlparse
 
 from agent_did_sdk import AgentIdentity, SignHttpRequestParams
@@ -59,11 +59,15 @@ class RotateKeysArgs(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class SupportsModelDump(Protocol):
+    def model_dump(self, *, by_alias: bool = False, exclude_none: bool = False) -> dict[str, Any]: ...
+
+
 def _with_prefix(prefix: str, name: str) -> str:
     return f"{prefix}_{name}"
 
 
-def _serialize_document(document: Any) -> dict[str, Any]:
+def _serialize_document(document: SupportsModelDump) -> dict[str, Any]:
     return document.model_dump(by_alias=True, exclude_none=True)
 
 
