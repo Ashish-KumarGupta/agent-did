@@ -3,6 +3,7 @@
 from .config import AgentDidExposureConfig, AgentDidIntegrationConfig
 from .context import build_agent_did_system_prompt, compose_system_prompt
 from .integration import AgentDidLangChainIntegration, create_agent_did_langchain_integration
+from .observability import AgentDidEventHandler, AgentDidObservabilityEvent, sanitize_observability_attributes
 from .snapshot import AgentDidIdentitySnapshot, build_agent_did_identity_snapshot
 from .tools import create_agent_did_tools
 
@@ -14,9 +15,12 @@ __all__ = [
     "AgentDidIdentitySnapshot",
     "AgentDidIntegrationConfig",
     "AgentDidLangChainIntegration",
+    "AgentDidEventHandler",
+    "AgentDidObservabilityEvent",
     "build_agent_did_identity_snapshot",
     "build_agent_did_system_prompt",
     "compose_system_prompt",
     "create_agent_did_langchain_integration",
     "create_agent_did_tools",
+    "sanitize_observability_attributes",
 ]

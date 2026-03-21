@@ -14,6 +14,8 @@ Esta variante complementa la integracion ya implementada en TypeScript/JavaScrip
 
 El paquete ya expone una factory publica, helpers de contexto, tools reutilizables, rotacion de claves opt-in y validacion de objetivos HTTP con rechazo por defecto de esquemas inseguros y destinos privados/loopback.
 
+Ahora tambien expone una capa ligera de observabilidad vendor-neutral basada en callbacks y/o logger, con redaccion por defecto de payloads, firmas, cuerpos HTTP y headers sensibles.
+
 ## Compatibilidad objetivo
 
 - `agent-did-sdk >=0.1.0`
@@ -57,6 +59,42 @@ agent = create_agent(
     system_prompt=integration.compose_system_prompt("Usa herramientas cuando aporten evidencia verificable."),
 )
 ```
+
+## Observabilidad
+
+La factory publica acepta instrumentacion opcional sin acoplar el paquete a un backend especifico:
+
+```python
+import logging
+
+from agent_did_langchain import create_agent_did_langchain_integration
+
+logger = logging.getLogger("agent_did_langchain")
+events = []
+
+integration = create_agent_did_langchain_integration(
+    agent_identity=agent_identity,
+    runtime_identity=runtime_identity,
+    expose={"sign_http": True, "sign_payload": True},
+    observability_handler=events.append,
+    logger=logger,
+)
+```
+
+Eventos emitidos:
+
+- `agent_did.identity_snapshot.refreshed`
+- `agent_did.tool.started`
+- `agent_did.tool.succeeded`
+- `agent_did.tool.failed`
+
+Redaccion por defecto:
+
+- `payload`, `body`, `signature` y `agent_private_key` se sustituyen por metadatos de longitud.
+- `Authorization`, `Signature`, `Signature-Input`, `Cookie`, `Set-Cookie` y `X-API-Key` se redactan en headers.
+- las URLs en eventos se normalizan sin query string, fragmento ni credenciales embebidas.
+
+Esto permite conectar LangSmith, logging estructurado, trazas locales o callbacks propios sin exponer material sensible por defecto.
 
 ## Hallazgos tecnicos confirmados
 
@@ -124,8 +162,11 @@ El plan tecnico cerrado por archivos, versiones objetivo y criterios de aceptaci
 - `src/agent_did_langchain/context.py`: composicion de prompt/contexto.
 - `src/agent_did_langchain/tools.py`: herramientas Agent-DID para LangChain Python.
 - `src/agent_did_langchain/integration.py`: ensamblaje publico del adaptador.
+- `src/agent_did_langchain/observability.py`: eventos, redaccion y hooks de observabilidad.
 - `tests/`: pruebas funcionales y de seguridad.
 - `examples/agent_did_langchain_example.py`: quick start runnable.
+- `examples/agent_did_langchain_observability_example.py`: callback tracing y redaccion segura.
+- `examples/agent_did_langchain_secure_http_example.py`: firma HTTP verificable end-to-end.
 
 ## Criterios de implementacion
 
@@ -133,7 +174,7 @@ El plan tecnico cerrado por archivos, versiones objetivo y criterios de aceptaci
 2. Permitir firma HTTP solo con opt-in explicito.
 3. Mantener rotacion de claves deshabilitada por defecto y fuera de este MVP.
 4. Inyectar identidad Agent-DID en el contexto del agente sin exponer secretos.
-5. Incluir ejemplo runnable y pruebas automatizadas en Python.
+5. Incluir ejemplos runnable y pruebas automatizadas en Python.
 
 ## Seguridad operativa
 
@@ -141,8 +182,22 @@ El plan tecnico cerrado por archivos, versiones objetivo y criterios de aceptaci
 - `sign_payload` solo existe con opt-in.
 - `rotate_keys` solo existe con opt-in.
 - Los secretos nunca se devuelven en outputs de tools.
+- La observabilidad redacta payloads, firmas, cuerpos HTTP y headers sensibles por defecto.
 - La firma HTTP rechaza por defecto `file://`, URLs con credenciales embebidas y destinos `localhost` o redes privadas.
 - Si el caso de uso requiere firmar hacia targets internos controlados, puede habilitarse `allow_private_network_targets=True` en la factory.
+
+## Ejemplos disponibles
+
+- `examples/agent_did_langchain_example.py`: ensamblaje base, tool calls directos y opcion de demo con modelo real usando `RUN_LANGCHAIN_MODEL_EXAMPLE=1`.
+- `examples/agent_did_langchain_observability_example.py`: muestra eventos estructurados y la redaccion aplicada a inputs sensibles.
+- `examples/agent_did_langchain_secure_http_example.py`: firma HTTP, devuelve headers verificables y valida la firma con el SDK Python.
+
+## Troubleshooting rapido
+
+- Si una tool devuelve `error`, revise el evento `agent_did.tool.failed` para ver el contexto ya redactado.
+- Si necesita correlacion entre prompt y snapshot de identidad, observe `agent_did.identity_snapshot.refreshed`.
+- Si `sign_http_request` falla con targets locales, confirme si debe habilitar explicitamente `allow_private_network_targets=True`.
+- Si usa un backend externo de observabilidad, conectelo mediante `observability_handler` o `logger` en lugar de leer secretos desde outputs de tools.
 
 ## Validacion local recomendada
 

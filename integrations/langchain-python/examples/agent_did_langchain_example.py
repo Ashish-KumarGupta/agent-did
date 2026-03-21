@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 
 from agent_did_sdk import AgentIdentity, AgentIdentityConfig, CreateAgentParams
@@ -14,7 +15,9 @@ from agent_did_langchain import create_agent_did_langchain_integration
 async def main() -> None:
     signer_address = os.environ.get("AGENT_DID_SIGNER_ADDRESS", "0x8888888888888888888888888888888888888888")
     model = os.environ.get("LANGCHAIN_MODEL", "openai:gpt-4.1-mini")
+    run_model_example = os.environ.get("RUN_LANGCHAIN_MODEL_EXAMPLE") == "1"
     identity = AgentIdentity(AgentIdentityConfig(signer_address=signer_address, network="polygon"))
+    emitted_events: list[tuple[str, dict[str, object]]] = []
 
     runtime_identity = await identity.create(
         CreateAgentParams(
@@ -29,9 +32,25 @@ async def main() -> None:
     integration = create_agent_did_langchain_integration(
         agent_identity=identity,
         runtime_identity=runtime_identity,
-        expose={"sign_http": True},
+        expose={"sign_http": True, "sign_payload": True},
         additional_system_context="Never sign arbitrary payloads.",
+        observability_handler=lambda event: emitted_events.append((event.event_type, event.attributes)),
     )
+
+    tools_by_name = {tool.name: tool for tool in integration.tools}
+    current_identity = await tools_by_name["agent_did_get_current_identity"].ainvoke({})
+    signed_payload = await tools_by_name["agent_did_sign_payload"].ainvoke({"payload": "proof-of-origin:demo"})
+
+    print("Current identity snapshot:")
+    print(json.dumps(current_identity, indent=2))
+    print("\nSigned payload summary:")
+    print(json.dumps({"did": signed_payload["did"], "key_id": signed_payload["key_id"]}, indent=2))
+    print("\nObserved events:")
+    print(json.dumps(emitted_events, indent=2))
+
+    if not run_model_example:
+        print("\nSet RUN_LANGCHAIN_MODEL_EXAMPLE=1 to execute the full model-backed LangChain agent demo.")
+        return
 
     agent = create_agent(
         model=model,
