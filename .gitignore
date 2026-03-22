@@ -6,6 +6,10 @@ build/
 coverage/
 *.log
 .vscode/settings.json
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
 
 # BMAD Method artifacts
 _bmad/
