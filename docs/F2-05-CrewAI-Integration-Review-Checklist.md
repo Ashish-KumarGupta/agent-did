@@ -32,6 +32,7 @@ Run this checklist when a change affects one or more of the following:
 - [ ] The intended factory name remains `create_agent_did_crewai_integration(...)`.
 - [ ] Public concepts remain centered on CrewAI-native surfaces: tools, callbacks, guardrails and structured outputs.
 - [ ] Any newly introduced helper surface is documented in the README and reflected in the implementation checklist.
+- [ ] Internal typing changes that affect CI, including helper properties and setters, preserve strict `mypy` compatibility on the supported Python matrix.
 
 ---
 

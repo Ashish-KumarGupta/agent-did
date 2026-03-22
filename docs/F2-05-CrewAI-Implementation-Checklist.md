@@ -53,6 +53,7 @@ Use this checklist when implementation work starts or when a PR changes CrewAI p
 - [x] Add Python tests for the integration factory and exposed tools.
 - [x] Add tests for secure defaults and failure handling.
 - [x] Add package build validation once implementation exists.
+- [x] Keep strict `mypy` compatibility for the shipped package surface, including helper properties and setters exercised by the CI matrix on Python 3.12.
 
 ---
 
