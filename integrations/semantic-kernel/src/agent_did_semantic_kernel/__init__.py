@@ -11,6 +11,8 @@ from .observability import (
     AgentDidSemanticKernelObservabilityEvent,
     compose_event_handlers,
     create_json_logger_event_handler,
+    create_opentelemetry_event_handler,
+    create_opentelemetry_tracer,
     sanitize_observability_attributes,
     serialize_observability_event,
 )
@@ -39,6 +41,8 @@ __all__ = [
     "create_agent_did_tools",
     "create_host_tool_specs",
     "create_json_logger_event_handler",
+    "create_opentelemetry_event_handler",
+    "create_opentelemetry_tracer",
     "create_semantic_kernel_plugin",
     "sanitize_observability_attributes",
     "serialize_observability_event",

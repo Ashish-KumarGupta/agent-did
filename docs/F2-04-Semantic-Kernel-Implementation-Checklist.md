@@ -55,6 +55,14 @@ Use this checklist when implementation work starts or when a PR changes the pack
 - [x] Add tests for secure defaults and failure handling.
 - [x] Add an optional real-runtime smoke path against `semantic-kernel` without forcing the runtime dependency in the default install.
 
+## Full Parity Claim Closure
+
+- [x] Add automated host-runtime coverage beyond the current smoke path, including at least one sessionful or multi-step flow.
+- [x] Add automated coverage for a sequence that exercises more than one Agent-DID tool in the same runtime scenario.
+- [x] Add a specialized observability surface or adapter beyond generic structured events, with redaction guarantees validated by tests.
+- [x] Add at least two deeper operational recipes: one multi-step or multi-tool recipe and one environment-aware observability or deployment recipe.
+- [x] Update README, parity matrix, maturity-gap assessment and review checklist together so the repository can accurately claim full parity with LangChain Python.
+
 ## Current Closure Notes
 
 - The shipped package is Python-native and no longer depends on the legacy JS scaffold.
@@ -63,7 +71,9 @@ Use this checklist when implementation work starts or when a PR changes the pack
 - The pytest bootstrap for async tests is now resilient to both clean environments and environments where `pytest-asyncio` is already auto-loaded.
 - Test bootstrap helpers continue to follow repo style rules, including spaces-only indentation so the Python lint step stays green across CI images.
 - Dedicated CI coverage is expected in `.github/workflows/ci-semantic-kernel.yml`.
-- Observability is vendor-neutral and sanitized by default, following the same governance line used in the other Python integrations.
+- Observability is vendor-neutral and sanitized by default, and now also projects to OpenTelemetry through an optional specialized adapter.
+- Runtime validation now includes a real semantic-kernel multi-step lifecycle with signing, verification, key rotation and document-history evidence.
+- The package now ships three operational recipes covering base runtime validation, composed observability and a production-oriented host sequence.
 
 ---
 

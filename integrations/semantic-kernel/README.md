@@ -2,7 +2,7 @@
 
 Integracion funcional de Agent-DID para Semantic Kernel con foco en Python.
 
-Esta variante reutiliza el SDK Python real de Agent-DID para snapshot de identidad, resolucion, verificacion, firma opt-in, contexto de sesion, hooks tipo middleware y observabilidad estructurada sin exponer secretos al runtime visible por el modelo.
+Esta variante reutiliza el SDK Python real de Agent-DID para snapshot de identidad, resolucion, verificacion, firma opt-in, contexto de sesion, hooks tipo middleware, observabilidad estructurada y un adaptador especializado a OpenTelemetry sin exponer secretos al runtime visible por el modelo.
 
 ## Estado
 
@@ -10,9 +10,11 @@ Esta variante reutiliza el SDK Python real de Agent-DID para snapshot de identid
 - Roadmap: F2-04
 - Lenguaje objetivo: Python
 - Dependencia previa resuelta: SDK Python de Agent-DID
-- Implementacion: funcional para tools base, contexto de identidad, middleware ligero y observabilidad saneada
+- Implementacion: funcional para tools base, contexto de identidad, middleware ligero, observabilidad saneada y validacion avanzada contra host real
 
-El paquete ya expone una factory publica, tools reutilizables, helpers para contexto y middleware, observabilidad vendor-neutral y defaults seguros. Las operaciones sensibles siguen siendo opt-in: firma HTTP, firma arbitraria, rotacion de claves e historial documental no se habilitan por defecto.
+El paquete ya expone una factory publica, tools reutilizables, helpers para contexto y middleware, observabilidad vendor-neutral, un camino especializado con OpenTelemetry y defaults seguros. Las operaciones sensibles siguen siendo opt-in: firma HTTP, firma arbitraria, rotacion de claves e historial documental no se habilitan por defecto.
+
+Con el estado actual, la claim correcta para F2-04 ya no es solo "paridad funcional base": el paquete tiene paridad operativa completa con LangChain Python dentro del alcance gobernado por este repositorio para runtime, observabilidad y recipes operativas.
 
 ## Hallazgos tecnicos confirmados
 
@@ -111,10 +113,11 @@ identity_result = await kernel.invoke(
 )
 ```
 
-Ese path no fuerza ejecucion LLM en CI. La validacion de paridad se centra en dos cosas mas utiles para esta fase:
+Ese path no fuerza ejecucion LLM en CI. La validacion de paridad ahora cubre tres cosas mas utiles para esta fase:
 
 - que `semantic-kernel` acepte el plugin generado por la integracion
-- que una tool Agent-DID real pueda invocarse a traves del runtime
+- que una secuencia multi-tool real pueda invocarse a traves del runtime
+- que el contexto inyectado y la identidad activa sigan consistentes a traves de rotacion de claves, verificacion y consulta de historial
 
 ## Recetas operativas
 
@@ -146,6 +149,58 @@ La recipe:
 Artefacto runnable asociado:
 
 - `examples/agent_did_semantic_kernel_operational_recipe_example.py`
+
+### Receta 2: observabilidad compuesta con OpenTelemetry
+
+Use esta receta cuando quiera proyectar los eventos Agent-DID a tres sinks a la vez sin cambiar la factory publica:
+
+- memoria local para debugging rapido
+- logging JSON saneado
+- spans OpenTelemetry con mapping deterministico y redaccion preservada
+
+Ejecute:
+
+```bash
+cd integrations/semantic-kernel
+python -m pip install -e .[dev]
+python examples/agent_did_semantic_kernel_composed_observability_example.py
+```
+
+La recipe:
+
+- crea un `TracerProvider` local con `InMemorySpanExporter`
+- compone callback local, JSON logging y `create_opentelemetry_event_handler(...)`
+- invoca varias tools para demostrar que la redaccion se conserva en los tres sinks
+- imprime spans terminados con atributos saneados para inspeccion local
+
+Artefacto runnable asociado:
+
+- `examples/agent_did_semantic_kernel_composed_observability_example.py`
+
+### Receta 3: recipe operativa de produccion sin corrida LLM obligatoria
+
+Use esta receta cuando quiera validar una secuencia mas cercana a operacion real sin depender de un modelo externo:
+
+- contexto inicial de sesion
+- firma de payload
+- verificacion criptografica
+- rotacion de clave activa
+- historial documental
+- firma HTTP opt-in
+- observabilidad compuesta con OpenTelemetry y JSON logging
+
+Ejecute:
+
+```bash
+cd integrations/semantic-kernel
+python -m pip install -e .[runtime,observability]
+set RUN_SEMANTIC_KERNEL_PRODUCTION_EXAMPLE=1
+python examples/agent_did_semantic_kernel_production_recipe_example.py
+```
+
+Artefacto runnable asociado:
+
+- `examples/agent_did_semantic_kernel_production_recipe_example.py`
 
 ## Observabilidad
 
@@ -180,6 +235,43 @@ Eventos emitidos:
 - `agent_did.context.created`
 - `agent_did.middleware.context_injected`
 
+Si necesita una capa mas especializada que el callback o el logger JSON base, el paquete tambien expone un camino OpenTelemetry opt-in:
+
+- `create_opentelemetry_tracer(...)`: obtiene un tracer compatible con la instalacion activa.
+- `create_opentelemetry_event_handler(tracer, ...)`: proyecta eventos Agent-DID a spans OpenTelemetry saneados, incluyendo lifecycle de tools y eventos genericos.
+
+Ejemplo minimo:
+
+```python
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+
+from agent_did_semantic_kernel.observability import (
+  compose_event_handlers,
+  create_json_logger_event_handler,
+  create_opentelemetry_event_handler,
+  create_opentelemetry_tracer,
+)
+
+provider = TracerProvider()
+exporter = InMemorySpanExporter()
+provider.add_span_processor(SimpleSpanProcessor(exporter))
+tracer = create_opentelemetry_tracer(tracer_provider=provider)
+
+observability_handler = compose_event_handlers(
+  local_events.append,
+  create_json_logger_event_handler(logger, extra_fields={"sink": "json"}),
+  create_opentelemetry_event_handler(tracer, extra_fields={"sink": "otel"}),
+)
+```
+
+Este adaptador especializado:
+
+- conserva redaccion de `payload`, `body`, `signature` y URLs sensibles
+- mantiene mapping estable para `agent_did.tool.started`, `agent_did.tool.succeeded` y `agent_did.tool.failed`
+- permite exportar spans a collectors reales o validarlos localmente con `InMemorySpanExporter`
+
 ## Defaults seguros
 
 - `current_identity`, `resolve_did` y `verify_signatures` quedan habilitados por defecto.
@@ -198,10 +290,12 @@ python -m pip install -e .[dev]
 python -m ruff check src/ tests/ examples/
 python -m mypy src/
 python -m pytest tests/ -q
-python -m pip install -e .[runtime]
+python -m pip install -e .[runtime,observability]
 python -m pytest tests/test_runtime_smoke.py -q
 python -m build
 ```
+
+La ruta anterior valida tanto la suite base como la cobertura avanzada de runtime real y la capa especializada de observabilidad.
 
 ## Gobernanza de implementacion
 

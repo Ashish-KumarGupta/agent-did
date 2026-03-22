@@ -62,6 +62,13 @@ Run this checklist when a change affects one or more of the following:
 - [ ] The test suite still guarantees async pytest support in a clean environment without double-registering `pytest_asyncio` when the plugin is auto-loaded by the host environment.
 - [ ] Test bootstrap helpers under `tests/` still follow the repository Python style rules, including spaces-only indentation required by Ruff.
 
+## Full Parity Claim Gate
+
+- [x] Automated host coverage now goes beyond plugin registration and single tool invocation.
+- [x] A specialized observability path now exists and its redaction guarantees are tested.
+- [x] The integration now ships deeper operational recipes than the original base runtime recipe.
+- [x] The parity claim is upgraded in README, parity matrix, maturity-gap assessment and implementation/review artifacts in the same PR with no residual caveat that contradicts the new claim.
+
 ---
 
 ## Decision Rule

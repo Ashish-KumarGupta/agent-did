@@ -11,7 +11,7 @@ Definir una integracion de Agent-DID para Semantic Kernel que reproduzca las cap
 - Paquete base: [../integrations/semantic-kernel/README.md](../integrations/semantic-kernel/README.md)
 - Referencia funcional existente: [../integrations/langchain/README.md](../integrations/langchain/README.md)
 - Superficie publica confirmada: `Kernel`, `KernelPlugin`, `Kernel.invoke(...)` y `ChatCompletionAgent`
-- Decision actual: implementar en Python sobre el SDK Python existente de Agent-DID y validar el host real mediante `semantic-kernel`
+- Decision actual: implementar en Python sobre el SDK Python existente de Agent-DID y validar el host real mediante `semantic-kernel`, con observabilidad especializada opt-in via OpenTelemetry
 
 ## Hallazgos de investigacion
 
@@ -28,8 +28,9 @@ La documentacion oficial consultada confirma que Semantic Kernel ofrece estas pi
 Aunque Semantic Kernel tiene presencia multi-language, en este repositorio la ruta validada y gobernada para F2-04 es Python. La evidencia implementada y probada esta concentrada en:
 
 - el paquete Python publicado en `integrations/semantic-kernel/`,
-- el smoke test de runtime real sobre `semantic-kernel`,
-- las recipes operativas del paquete y su CI dedicada.
+- la suite de runtime real sobre `semantic-kernel`,
+- las recipes operativas del paquete y su CI dedicada,
+- la capa especializada de observabilidad basada en OpenTelemetry.
 
 Por eso, F2-04 no debe asumirse como un paquete JavaScript por defecto. La decision actual del proyecto es implementarlo en Python, con compatibilidad real verificada contra el host `semantic-kernel`.
 
@@ -81,7 +82,7 @@ plugin = integration.create_semantic_kernel_plugin(plugin_name="agent_did")
 1. Factory principal del adaptador.
 2. Mapeo de herramientas Agent-DID al mecanismo nativo del framework.
 3. Inyeccion de identidad al contexto del agente.
-4. Ejemplo runnable equivalente al de LangChain.
+4. Ejemplos runnable equivalentes al nivel operativo de LangChain.
 5. Suite de pruebas automatizadas.
 6. Uso del SDK Python de Agent-DID como dependencia base.
 
@@ -95,11 +96,11 @@ plugin = integration.create_semantic_kernel_plugin(plugin_name="agent_did")
 
 ## Recomendacion actual
 
-La siguiente iteracion de F2-04 puede centrarse en endurecimiento y validacion de runtime real, no en scaffold adicional. El adaptador Python para tools, plugins, contexto y observabilidad ya existe; el siguiente trabajo natural es ampliar recipes operativas o smoke tests contra superficies mas profundas del host `semantic-kernel`.
+La siguiente iteracion de F2-04 ya no necesita cerrar brechas materiales de parity. El adaptador Python para tools, plugins, contexto, runtime real y observabilidad especializada ya existe; el siguiente trabajo natural pasa a ser mantenimiento incremental o extensiones no requeridas para la claim actual.
 
 ## Criterio de cierre
 
-F2-04 se considerara implementado cuando exista un paquete funcional bajo `integrations/semantic-kernel/`, con ejemplo ejecutable, pruebas automatizadas y documentacion de uso equivalente a la ya disponible en LangChain.
+F2-04 se considera implementado con parity operativa cerrada cuando exista un paquete funcional bajo `integrations/semantic-kernel/`, con ejemplos ejecutables, pruebas automatizadas de runtime real multi-step, observabilidad especializada validada y documentacion de uso equivalente a la ya disponible en LangChain.
 
 ## Artefactos de control
 

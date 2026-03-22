@@ -1,4 +1,4 @@
-name: CI - Semantic Kernel Integration
+name: CI — Semantic Kernel Integration
 
 on:
   push:

@@ -12,6 +12,8 @@ from agent_did_semantic_kernel.observability import (
     AgentDidSemanticKernelObservabilityEvent,
     compose_event_handlers,
     create_json_logger_event_handler,
+    create_opentelemetry_event_handler,
+    create_opentelemetry_tracer,
 )
 
 
@@ -145,3 +147,57 @@ def test_json_logger_event_handler_emits_structured_sanitized_payload() -> None:
     assert record["attributes"]["url"] == "https://api.example.com/path"
     assert record["component"] == "tests"
     assert record["payload"] == {"redacted": True, "length": 13}
+
+
+def test_opentelemetry_event_handler_tracks_tool_lifecycle_with_redaction() -> None:
+    pytest.importorskip("opentelemetry.sdk.trace")
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+
+    provider = TracerProvider()
+    exporter = InMemorySpanExporter()
+    provider.add_span_processor(SimpleSpanProcessor(exporter))
+    tracer = create_opentelemetry_tracer(tracer_provider=provider)
+    handler = create_opentelemetry_event_handler(
+        tracer,
+        include_timestamp=False,
+        extra_fields={"service": "tests", "payload": "should-redact"},
+    )
+
+    handler(
+        AgentDidSemanticKernelObservabilityEvent(
+            event_type="agent_did.tool.started",
+            attributes={
+                "tool_name": "agent_did_sign_http_request",
+                "did": "did:agent:test:semantic-kernel",
+                "inputs": {
+                    "url": "https://api.example.com/runtime?token=secret",
+                    "body": "very-secret-body",
+                },
+            },
+        )
+    )
+    handler(
+        AgentDidSemanticKernelObservabilityEvent(
+            event_type="agent_did.tool.succeeded",
+            attributes={
+                "tool_name": "agent_did_sign_http_request",
+                "did": "did:agent:test:semantic-kernel",
+                "outputs": {"header_names": ["Signature", "Signature-Input"]},
+            },
+        )
+    )
+
+    spans = exporter.get_finished_spans()
+
+    assert len(spans) == 1
+    span = spans[0]
+    assert span.name == "agent_did_sign_http_request"
+    assert span.attributes["agent_did.event_type"] == "agent_did.tool.succeeded"
+    assert span.attributes["agent_did.attributes.inputs.url"] == "https://api.example.com/runtime"
+    assert span.attributes["agent_did.attributes.inputs.body.redacted"] is True
+    assert span.attributes["agent_did.attributes.inputs.body.length"] == 16
+    assert span.attributes["agent_did.payload.redacted"] is True
+    assert span.attributes["agent_did.payload.length"] == 13
+    assert span.attributes["agent_did.service"] == "tests"

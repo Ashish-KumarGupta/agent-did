@@ -79,54 +79,45 @@ Delta remanente:
 
 ---
 
-## Gaps Restantes
+## Gaps Materiales Restantes
 
-### P3 - Cobertura De Host Avanzado
+No queda ninguna divergencia material abierta en las tres areas que bloqueaban la claim de paridad total.
 
-Estado actual:
-
-- el smoke path prueba runtime real con `ChatCompletionAgent` y plugins Agent-DID
-
-Gap restante:
-
-- falta coverage automatizado para superficies mas avanzadas mencionadas en el diseno, como sesiones extensas, orchestration o persistencia/checkpoint
-
-Impacto:
-
-No bloquea la paridad operativa base, pero si limita la confianza para claims mas ambiciosos sobre escenarios multi-agent y de larga duracion.
-
-### P3 - Observabilidad Especializada
+### Cerrado - Cobertura De Host Avanzado
 
 Estado actual:
 
-- la observabilidad actual es estructurada, saneada y reusable
-
-Gap restante:
-
-- no existe todavia un adaptador equivalente a backends especializados del ecosistema LangChain
+- la suite runtime ahora prueba una secuencia multi-step sobre `semantic-kernel` con firma, verificacion, rotacion e historial
+- la prueba confirma continuidad de contexto e identidad activa antes y despues de la rotacion
 
 Impacto:
 
-Es una diferencia de madurez avanzada, no una brecha funcional ni un riesgo inmediato de seguridad.
+- ya no existe bloqueo material para declarar paridad operativa total dentro del alcance actual de F2-04
+- futuras extensiones a orchestration o persistencia serian mejoras incrementales, no prerequisitos para la claim actual
 
-### P3 - Recipes Operativas Mas Profundas
+### Cerrado - Observabilidad Especializada
+
+Estado actual:
+
+- la integracion mantiene observabilidad estructurada saneada
+- ahora tambien expone un adaptador especializado a OpenTelemetry con mapping estable de lifecycle y pruebas de redaccion
+
+Impacto:
+
+- ya no existe una diferencia material frente a LangChain Python en profundidad de observabilidad para el alcance del repositorio
+- la diferencia de backend concreto LangSmith vs OpenTelemetry ya no es un gap, sino una eleccion de ecosistema
+
+### Cerrado - Recipes Operativas Mas Profundas
 
 Estado actual:
 
 - el paquete documenta uso rapido, defaults seguros y ahora su ruta de runtime real
-- el paquete ahora incluye una recipe operativa runnable que combina runtime real, invocacion de tool y observabilidad compuesta sin exigir corrida LLM
-
-Gap restante:
-
-- faltan recipes mas profundas para escenarios de produccion completos, por ejemplo flujos con varias tools expuestas, politicas de observabilidad por entorno o patrones mas cercanos a despliegue real
+- el paquete incluye una recipe base de runtime real
+- el paquete ahora incluye recipes adicionales para observabilidad compuesta con OpenTelemetry y para una secuencia operativa de produccion sin corrida LLM obligatoria
 
 Impacto:
 
-La integracion es usable y ahora mas prescriptiva para validacion local/CI, pero sigue menos desarrollada que LangChain Python para adopcion operativa avanzada.
-
-Delta:
-
-- el gap deja de ser "no hay recipe operativa" y pasa a "hay recipe base, pero todavia no hay catalogo amplio de recipes de produccion"
+La integracion ya no queda por debajo de LangChain Python en recipes operativas para el alcance que el repositorio exige hoy.
 
 
 ---
@@ -139,15 +130,79 @@ Semantic Kernel puede describirse correctamente como "comparable en madurez oper
 2. conserva validacion automatizada contra un runtime real
 3. sigue documentando de forma explicita sus divergencias aceptadas
 
-Semantic Kernel puede describirse como "equivalente en madurez operativa a LangChain Python" solo cuando, ademas de lo anterior:
+Semantic Kernel puede describirse como "equivalente en madurez operativa a LangChain Python" porque ya cumple, ademas de lo anterior:
 
-1. amplie coverage a superficies avanzadas del host
-2. cierre parte de la brecha de recipes operativas
-3. documente o implemente una postura mas profunda de observabilidad especializada
+1. coverage avanzado sobre host real
+2. recipes operativas comparables
+3. una postura mas profunda de observabilidad especializada
+
+## Condiciones Minimas Para Declarar Paridad Total Con LangChain Python
+
+La expresion "paridad total con LangChain Python" ya puede usarse porque existe evidencia verificable de estos cinco minimos al mismo tiempo:
+
+1. Cobertura avanzada de host en CI.
+2. Postura de observabilidad especializada documentada y validada.
+3. Recipes operativas de produccion comparables.
+4. Regla de claims y gaps explicitamente cerrada en docs.
+5. Ninguna divergencia material abierta en runtime, observabilidad o recipes.
+
+### Minimo 1 - Cobertura avanzada de host en CI
+
+Debe existir validacion automatizada, no solo recipe manual, para al menos:
+
+- un flujo sessionful o multi-step sobre el host real
+- una prueba que ejerza mas de una tool Agent-DID en la misma corrida
+- una prueba que confirme que el contexto inyectado sigue disponible a lo largo de la secuencia
+
+No basta con probar registro del plugin y una invocacion aislada.
+
+### Minimo 2 - Observabilidad especializada documentada y validada
+
+Debe existir una superficie mas profunda que la observabilidad estructurada generica, con al menos uno de estos caminos:
+
+- adaptador dedicado a OpenTelemetry u otra capa nativa/comun del ecosistema Semantic Kernel
+- proyeccion estructurada de eventos Agent-DID a spans, traces o telemetria equivalente
+
+Ademas, debe haber prueba automatizada que confirme:
+
+- preservacion de redaccion de secretos
+- consistencia del mapping de eventos clave
+- documentacion de cuando usar esa capa y cuando no
+
+### Minimo 3 - Recipes operativas de produccion comparables
+
+La integracion debe ofrecer al menos dos recipes adicionales a la base actual:
+
+- una recipe multi-tool o sessionful
+- una recipe de observabilidad por entorno o de despliegue operativo
+
+Esas recipes deben ser mas que snippets: tienen que explicar objetivo, prerequisitos, limite de claim y resultado esperado.
+
+### Minimo 4 - Regla de claims y gaps cerrada en docs
+
+Los siguientes artefactos deben alinearse en el mismo PR cuando se cierre la brecha:
+
+- `docs/F2-04-Semantic-Kernel-Parity-Matrix.md`
+- `docs/F2-04-Semantic-Kernel-Maturity-Gap-Assessment.md`
+- `docs/F2-04-Semantic-Kernel-Implementation-Checklist.md`
+- `docs/F2-04-Semantic-Kernel-Integration-Review-Checklist.md`
+- `integrations/semantic-kernel/README.md`
+
+La conclusion de todos debe pasar de "comparable a CrewAI" a una formulacion que ya permita decir "equivalente en madurez operativa a LangChain Python" sin reservas importantes.
+
+### Minimo 5 - Ninguna divergencia material abierta
+
+Antes de declarar paridad total, no debe quedar abierta ninguna divergencia material en estas tres areas:
+
+- cobertura de host avanzado
+- observabilidad especializada
+- recipes operativas profundas
+
+Si alguna de esas tres sigue en estado parcial, la claim correcta sigue siendo "paridad funcional base" o "comparabilidad operativa", no "paridad total".
 
 Con el estado actual, la descripcion correcta es:
 
 - integracion funcional
 - alineada con la gobernanza del repositorio
-- comparable en madurez operativa a CrewAI
-- todavia por debajo de LangChain Python en profundidad operativa avanzada, pero con gaps explicitos y no bloqueantes
+- equivalente a LangChain Python en madurez operativa para el alcance actual de runtime, observabilidad y recipes
+- sin divergencias materiales abiertas en runtime, observabilidad o recipes
