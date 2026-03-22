@@ -10,7 +10,7 @@ const RULES = [
     ],
   },
   {
-    name: "CrewAI integration scaffold",
+    name: "CrewAI integration",
     watchedPrefixes: ["integrations/crewai/"],
     requiredDocs: [
       "docs/F2-05-CrewAI-Implementation-Checklist.md",
