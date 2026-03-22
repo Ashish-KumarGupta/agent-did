@@ -32,6 +32,7 @@ Run this checklist when a change affects one or more of the following:
 - [ ] The intended factory name remains `createAgentDidMicrosoftAgentFrameworkIntegration(...)` at the conceptual surface.
 - [ ] Public concepts remain centered on runtime-native surfaces: tools, middleware, context and observability.
 - [ ] Any newly introduced helper surface is documented in the README and reflected in the implementation checklist.
+- [ ] Any runtime helper added for host validation, such as `create_semantic_kernel_plugin(...)`, remains optional and documented as a host-compatibility surface rather than a forced default dependency.
 
 ---
 
@@ -40,6 +41,7 @@ Run this checklist when a change affects one or more of the following:
 - [ ] Sensitive capabilities remain opt-in.
 - [ ] Private keys remain outside model-visible prompts and context.
 - [ ] Runtime hooks, logging and future observability paths do not expose raw secrets by default.
+- [ ] Runtime smoke tests and operational recipes redact payloads, signatures and sensitive headers in emitted observability events.
 
 ---
 
@@ -48,9 +50,19 @@ Run this checklist when a change affects one or more of the following:
 - [ ] `docs/F2-04-Microsoft-Agent-Framework-Implementation-Checklist.md` still reflects the next concrete delivery step.
 - [ ] The README still points to the implementation and review checklists.
 - [ ] If shipped behavior changes, the design doc is updated in the same PR.
+- [ ] If runtime compatibility scope changes, the parity matrix and maturity-gap assessment are updated in the same PR.
+- [ ] If an operational recipe is added, the README explains when to run it and what it validates.
+
+---
+
+## Runtime Validation
+
+- [ ] The optional `.[runtime]` extra still installs the intended host-validation dependency without bloating the default package install.
+- [ ] The semantic-kernel smoke path validates at least one zero-argument tool and one parameterized tool.
+- [ ] The test suite still registers async pytest support explicitly enough to run in a clean environment.
 
 ---
 
 ## Decision Rule
 
-Microsoft Agent Framework review is complete when the scaffold state is accurately described, security expectations remain explicit, and all implementation-facing artifacts agree on the next step.
+Microsoft Agent Framework review is complete when the scaffold state is accurately described, runtime validation claims are backed by executable checks, security expectations remain explicit, and all implementation-facing artifacts agree on the delivered scope and next step.
