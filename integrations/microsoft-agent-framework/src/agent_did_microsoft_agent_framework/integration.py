@@ -92,6 +92,20 @@ class AgentDidMicrosoftAgentFrameworkIntegration:
             "context": self.create_session_context(),
         }
 
+    def create_semantic_kernel_plugin(
+        self,
+        *,
+        plugin_name: str = "agent_did",
+        description: str | None = None,
+    ) -> Any:
+        from .runtime import create_semantic_kernel_plugin
+
+        return create_semantic_kernel_plugin(
+            self.tools,
+            plugin_name=plugin_name,
+            description=description,
+        )
+
 
 def create_agent_did_microsoft_agent_framework_integration(
     *,

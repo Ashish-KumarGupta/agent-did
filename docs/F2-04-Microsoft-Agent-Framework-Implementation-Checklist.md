@@ -53,11 +53,13 @@ Use this checklist when implementation work starts or when a PR changes the pack
 - [x] Add tests for the adapter factory and tool exposure.
 - [x] Add tests for middleware or context injection semantics.
 - [x] Add tests for secure defaults and failure handling.
+- [x] Add an optional real-runtime smoke path against `semantic-kernel` without forcing the runtime dependency in the default install.
 
 ## Current Closure Notes
 
 - The shipped package is Python-native and no longer depends on the legacy JS scaffold.
 - The integration exposes tool specs, session context helpers and middleware-like hooks without forcing a hard runtime dependency.
+- The package now exposes a `.[runtime]` extra and a semantic-kernel plugin helper for validating real host compatibility.
 - Dedicated CI coverage is expected in `.github/workflows/ci-microsoft-agent-framework.yml`.
 - Observability is vendor-neutral and sanitized by default, following the same governance line used in the other Python integrations.
 

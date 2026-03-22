@@ -14,6 +14,7 @@ from .observability import (
     sanitize_observability_attributes,
     serialize_observability_event,
 )
+from .runtime import create_semantic_kernel_plugin
 from .snapshot import AgentDidIdentitySnapshot, build_agent_did_identity_snapshot
 from .tools import MicrosoftAgentFrameworkTool, create_agent_did_tools, create_host_tool_specs
 
@@ -38,6 +39,7 @@ __all__ = [
     "create_agent_did_tools",
     "create_host_tool_specs",
     "create_json_logger_event_handler",
+    "create_semantic_kernel_plugin",
     "sanitize_observability_attributes",
     "serialize_observability_event",
 ]

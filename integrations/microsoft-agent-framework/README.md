@@ -79,8 +79,76 @@ El bundle devuelto incluye:
 - `create_agent_kwargs(...)` para entregar `tools`, `instructions` y `context`
 - `create_session_context(...)` para inyectar identidad Agent-DID en session state
 - `create_context_middleware(...)` para hooks ligeros de enriquecimiento de contexto
+- `create_semantic_kernel_plugin(...)` para registrar las tools en un runtime real de `semantic-kernel`
 
 La API publica tambien exporta el alias conceptual `createAgentDidMicrosoftAgentFrameworkIntegration(...)` para mantener continuidad con los artefactos de diseno, aunque la superficie Python-first recomendada es `create_agent_did_microsoft_agent_framework_integration(...)`.
+
+## Runtime real con semantic-kernel
+
+La integracion sigue siendo liviana por defecto, pero ahora expone un extra opcional `runtime` para validar y usar un runtime real de Microsoft mediante `semantic-kernel`.
+
+```bash
+python -m pip install -e ".[runtime]"
+```
+
+Ejemplo minimo de registro sobre el runtime real:
+
+```python
+from semantic_kernel.agents.chat_completion.chat_completion_agent import ChatCompletionAgent
+from semantic_kernel.kernel import Kernel
+
+plugin = integration.create_semantic_kernel_plugin(plugin_name="agent_did")
+kernel = Kernel()
+kernel.add_plugin(plugin)
+
+agent = ChatCompletionAgent(
+  name="Verifier",
+  instructions=integration.compose_instructions("Usa Agent-DID cuando necesites evidencia verificable."),
+  kernel=kernel,
+  plugins=[plugin],
+)
+
+identity_result = await kernel.invoke(
+  function_name="agent_did_get_current_identity",
+  plugin_name="agent_did",
+)
+```
+
+Ese path no fuerza ejecucion LLM en CI. La validacion de paridad se centra en dos cosas mas utiles para esta fase:
+
+- que `semantic-kernel` acepte el plugin generado por la integracion
+- que una tool Agent-DID real pueda invocarse a traves del runtime
+
+## Recetas operativas
+
+### Receta 1: runtime real con observabilidad compuesta
+
+Use esta receta cuando quiera validar en local tres cosas a la vez sin depender de una corrida LLM completa:
+
+- registro real del plugin en `semantic-kernel`
+- invocacion de una tool Agent-DID desde `Kernel.invoke(...)`
+- fan-out de observabilidad a memoria y logging JSON saneado
+
+Ejecute:
+
+```bash
+cd integrations/microsoft-agent-framework
+python -m pip install -e .[dev]
+python -m pip install -e .[runtime]
+python examples/agent_did_microsoft_agent_framework_operational_recipe_example.py
+```
+
+La recipe:
+
+- crea una identidad efimera con `InMemoryAgentRegistry`
+- compone `events.append` con `create_json_logger_event_handler(...)`
+- registra el plugin Agent-DID en `Kernel`
+- instancia `ChatCompletionAgent` sin requerir ejecucion de modelo
+- invoca `agent_did_sign_payload` para demostrar compatibilidad de runtime y redaccion de observabilidad
+
+Artefacto runnable asociado:
+
+- `examples/agent_did_microsoft_agent_framework_operational_recipe_example.py`
 
 ## Observabilidad
 
@@ -133,6 +201,8 @@ python -m pip install -e .[dev]
 python -m ruff check src/ tests/ examples/
 python -m mypy src/
 python -m pytest tests/ -q
+python -m pip install -e .[runtime]
+python -m pytest tests/test_runtime_smoke.py -q
 python -m build
 ```
 
@@ -140,6 +210,8 @@ python -m build
 
 - Checklist de implementacion: [../../docs/F2-04-Microsoft-Agent-Framework-Implementation-Checklist.md](../../docs/F2-04-Microsoft-Agent-Framework-Implementation-Checklist.md)
 - Checklist de review recurrente: [../../docs/F2-04-Microsoft-Agent-Framework-Integration-Review-Checklist.md](../../docs/F2-04-Microsoft-Agent-Framework-Integration-Review-Checklist.md)
+- Matriz de paridad: [../../docs/F2-04-Microsoft-Agent-Framework-Parity-Matrix.md](../../docs/F2-04-Microsoft-Agent-Framework-Parity-Matrix.md)
+- Evaluacion de brecha de madurez: [../../docs/F2-04-Microsoft-Agent-Framework-Maturity-Gap-Assessment.md](../../docs/F2-04-Microsoft-Agent-Framework-Maturity-Gap-Assessment.md)
 
 ## Referencias
 
