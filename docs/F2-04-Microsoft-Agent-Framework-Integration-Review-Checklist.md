@@ -60,6 +60,7 @@ Run this checklist when a change affects one or more of the following:
 - [ ] The optional `.[runtime]` extra still installs the intended host-validation dependency without bloating the default package install.
 - [ ] The semantic-kernel smoke path validates at least one zero-argument tool and one parameterized tool.
 - [ ] The test suite still guarantees async pytest support in a clean environment without double-registering `pytest_asyncio` when the plugin is auto-loaded by the host environment.
+- [ ] Test bootstrap helpers under `tests/` still follow the repository Python style rules, including spaces-only indentation required by Ruff.
 
 ---
 

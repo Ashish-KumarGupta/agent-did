@@ -61,6 +61,7 @@ Use this checklist when implementation work starts or when a PR changes the pack
 - The integration exposes tool specs, session context helpers and middleware-like hooks without forcing a hard runtime dependency.
 - The package now exposes a `.[runtime]` extra and a semantic-kernel plugin helper for validating real host compatibility.
 - The pytest bootstrap for async tests is now resilient to both clean environments and environments where `pytest-asyncio` is already auto-loaded.
+- Test bootstrap helpers continue to follow repo style rules, including spaces-only indentation so the Python lint step stays green across CI images.
 - Dedicated CI coverage is expected in `.github/workflows/ci-microsoft-agent-framework.yml`.
 - Observability is vendor-neutral and sanitized by default, following the same governance line used in the other Python integrations.
 
