@@ -31,7 +31,7 @@
     "zero-trust"
   ],
   "author": "Edison Munoz <edison.munoz@agent-did.org>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/edisonduran/Agent-citizen-identification.git",

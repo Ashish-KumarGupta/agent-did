@@ -23,7 +23,7 @@
     "tool-calling"
   ],
   "author": "Edison Munoz <edison.munoz@agent-did.org>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "peerDependencies": {
     "@agent-did/sdk": "^0.1.0",
     "@langchain/core": "^1.1.34",
