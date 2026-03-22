@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from agent_did_sdk import AgentIdentity, AgentIdentityConfig, CreateAgentParams, InMemoryAgentRegistry
+from pydantic import BaseModel
 
 from agent_did_crewai import PACKAGE_STATUS, create_agent_did_crewai_integration
 
@@ -42,6 +43,42 @@ async def test_factory_returns_expected_integration_object() -> None:
     assert task_kwargs["output_pydantic"].model_fields["result"].is_required()
     assert "step_callback" in crew_kwargs
     assert "task_callback" in crew_kwargs
+
+
+@pytest.mark.asyncio
+async def test_factory_adapts_tools_to_runtime_basetool_when_available(monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeBaseTool(BaseModel):
+        name: str
+        description: str
+        args_schema: type[BaseModel]
+
+    from agent_did_crewai import tools as crewai_tools_module
+
+    monkeypatch.setattr(crewai_tools_module, "_load_crewai_basetool_class", lambda: FakeBaseTool)
+
+    AgentIdentity.set_registry(InMemoryAgentRegistry())
+    identity = AgentIdentity(AgentIdentityConfig(signer_address="0x9393939393939393939393939393939393939393"))
+    runtime_identity = await identity.create(
+        CreateAgentParams(
+            name="CrewRuntimeAdapterBot",
+            core_model="gpt-4.1-mini",
+            system_prompt="Runtime tool adapter test",
+        )
+    )
+
+    integration = create_agent_did_crewai_integration(
+        agent_identity=identity,
+        runtime_identity=runtime_identity,
+    )
+
+    agent_kwargs = integration.create_agent_kwargs("CrewAI runtime adapter prompt")
+    task_kwargs = integration.create_task_kwargs(required_output_fields=["result"])
+
+    assert agent_kwargs["tools"] != integration.tools
+    assert task_kwargs["tools"] != integration.tools
+    assert all(isinstance(tool, FakeBaseTool) for tool in agent_kwargs["tools"])
+    assert all(isinstance(tool, FakeBaseTool) for tool in task_kwargs["tools"])
+    assert {tool.name for tool in agent_kwargs["tools"]} == {tool.name for tool in integration.tools}
 
 
 @pytest.mark.asyncio

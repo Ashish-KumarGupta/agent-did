@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import importlib
 import inspect
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from functools import lru_cache
 from ipaddress import ip_address
 from typing import Any
 from urllib.parse import urlparse
@@ -132,6 +134,49 @@ def _run_awaitable(result: Awaitable[dict[str, Any]]) -> dict[str, Any]:
     except RuntimeError:
         return asyncio.run(_await_runner_result(result))
     raise RuntimeError("Use 'ainvoke' or 'arun' when calling CrewAI tools from an active event loop")
+
+
+@lru_cache(maxsize=1)
+def _load_crewai_basetool_class() -> type[Any] | None:
+    try:
+        crewai_tools_module = importlib.import_module("crewai.tools")
+    except ImportError:
+        return None
+    return getattr(crewai_tools_module, "BaseTool", None)
+
+
+def _build_crewai_runtime_tool(tool: CrewAITool, base_tool_cls: type[Any]) -> Any:
+    def _run(self: Any, **kwargs: Any) -> dict[str, Any]:
+        return tool.run(**kwargs)
+
+    async def _arun(self: Any, **kwargs: Any) -> dict[str, Any]:
+        return await tool.arun(**kwargs)
+
+    runtime_tool_cls = type(
+        f"{''.join(part.capitalize() for part in tool.name.split('_'))}RuntimeTool",
+        (base_tool_cls,),
+        {
+            "__module__": __name__,
+            "__annotations__": {
+                "name": str,
+                "description": str,
+                "args_schema": type[BaseModel],
+            },
+            "name": tool.name,
+            "description": tool.description,
+            "args_schema": tool.args_schema,
+            "_run": _run,
+            "_arun": _arun,
+        },
+    )
+    return runtime_tool_cls()
+
+
+def create_crewai_host_tools(tools: list[CrewAITool]) -> list[Any]:
+    base_tool_cls = _load_crewai_basetool_class()
+    if base_tool_cls is None:
+        return list(tools)
+    return [_build_crewai_runtime_tool(tool, base_tool_cls) for tool in tools]
 
 
 def _with_prefix(prefix: str, name: str) -> str:

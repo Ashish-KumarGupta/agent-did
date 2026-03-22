@@ -64,8 +64,8 @@ El bundle devuelto incluye:
 - `tools`: wrappers compatibles con el patrón de tools del host
 - `get_current_identity()` y `get_current_document()`
 - `compose_system_prompt(...)`
-- `create_agent_kwargs(...)` para inyectar backstory y tools en `Agent`
-- `create_task_kwargs(...)` para inyectar callback, guardrail, `output_pydantic` y tools en `Task`
+- `create_agent_kwargs(...)` para inyectar backstory y tools en `Agent`; si CrewAI real esta instalado adapta automaticamente a `BaseTool`
+- `create_task_kwargs(...)` para inyectar callback, guardrail, `output_pydantic` y tools en `Task`; si CrewAI real esta instalado adapta automaticamente a `BaseTool`
 - `create_crew_kwargs(...)` para inyectar `step_callback` y `task_callback` en `Crew`
 - `create_output_model(...)` y `create_identity_output_model(...)` para contratos `output_pydantic`
 

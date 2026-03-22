@@ -18,7 +18,7 @@ from .snapshot import (
     RuntimeIdentityHandle,
     build_agent_did_identity_snapshot,
 )
-from .tools import CrewAITool, create_agent_did_tools
+from .tools import CrewAITool, create_agent_did_tools, create_crewai_host_tools
 
 
 @dataclass(slots=True)
@@ -64,7 +64,7 @@ class AgentDidCrewAIIntegration:
 
     def create_agent_kwargs(self, base_prompt: str | None = None) -> dict[str, Any]:
         return {
-            "tools": self.tools,
+            "tools": create_crewai_host_tools(self.tools),
             "backstory": self.compose_system_prompt(base_prompt),
         }
 
@@ -94,7 +94,7 @@ class AgentDidCrewAIIntegration:
             "output_pydantic": output_model,
         }
         if include_tools:
-            task_kwargs["tools"] = self.tools
+            task_kwargs["tools"] = create_crewai_host_tools(self.tools)
         return task_kwargs
 
     def create_crew_kwargs(self) -> dict[str, Any]:
