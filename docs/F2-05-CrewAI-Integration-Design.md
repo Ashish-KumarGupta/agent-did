@@ -82,7 +82,7 @@ integration = create_agent_did_crewai_integration(
 
 ## Recomendacion actual
 
-La siguiente iteracion de F2-05 ya no es cerrar el paquete base, sino mantener paridad documental y ampliar casos avanzados solo si aparecen requisitos nuevos del host runtime.
+La siguiente iteracion de F2-05 ya no es cerrar el paquete base, sino cerrar los gaps de madurez operativa respecto de LangChain: observabilidad estructurada, validacion contra runtime real, mayor cobertura de ejemplos y una suite de pruebas mas granular.
 
 ## Criterio de cierre
 
@@ -92,3 +92,4 @@ F2-05 se considera implementado en el alcance actual del repo: existe un paquete
 
 - Checklist de implementacion: `docs/F2-05-CrewAI-Implementation-Checklist.md`
 - Checklist de review: `docs/F2-05-CrewAI-Integration-Review-Checklist.md`
+- Evaluacion de madurez y gaps restantes: `docs/F2-05-CrewAI-Maturity-Gap-Assessment.md`

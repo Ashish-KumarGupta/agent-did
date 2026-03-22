@@ -48,6 +48,7 @@ Run this checklist when a change affects one or more of the following:
 
 - [ ] `docs/F2-05-CrewAI-Implementation-Checklist.md` still reflects the current shipped completion state or the next concrete delta.
 - [ ] The README still points to the implementation and review checklists.
+- [ ] The README and design doc still point to `docs/F2-05-CrewAI-Maturity-Gap-Assessment.md` when maturity claims or remaining gaps change.
 - [ ] If shipped behavior changes, the design doc is updated in the same PR.
 
 ---

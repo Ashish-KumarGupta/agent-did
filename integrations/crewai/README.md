@@ -128,6 +128,7 @@ python -m pytest tests/ -q
 
 - Checklist de implementacion: [../../docs/F2-05-CrewAI-Implementation-Checklist.md](../../docs/F2-05-CrewAI-Implementation-Checklist.md)
 - Checklist de review recurrente: [../../docs/F2-05-CrewAI-Integration-Review-Checklist.md](../../docs/F2-05-CrewAI-Integration-Review-Checklist.md)
+- Evaluacion de madurez frente a LangChain: [../../docs/F2-05-CrewAI-Maturity-Gap-Assessment.md](../../docs/F2-05-CrewAI-Maturity-Gap-Assessment.md)
 
 ## Referencias
 
