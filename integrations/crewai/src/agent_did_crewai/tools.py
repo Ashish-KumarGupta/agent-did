@@ -14,7 +14,12 @@ from agent_did_sdk import AgentIdentity, SignHttpRequestParams
 from pydantic import BaseModel, ConfigDict, Field
 
 from .config import AgentDidExposureConfig
-from .snapshot import RuntimeIdentityHandle, build_agent_did_identity_snapshot, get_active_authentication_key_id
+from .snapshot import (
+    RuntimeIdentity,
+    RuntimeIdentityHandle,
+    build_agent_did_identity_snapshot,
+    get_active_authentication_key_id,
+)
 
 MAX_PAYLOAD_BYTES = 1_048_576
 
@@ -77,11 +82,11 @@ class _ToolRuntimeContext:
     allow_private_network_targets: bool
 
     @property
-    def runtime_identity(self):
+    def runtime_identity(self) -> RuntimeIdentity:
         return self.runtime_identity_handle.value
 
     @runtime_identity.setter
-    def runtime_identity(self, value):
+    def runtime_identity(self, value: RuntimeIdentity) -> None:
         self.runtime_identity_handle.value = value
 
     @property
