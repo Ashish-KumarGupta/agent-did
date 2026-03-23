@@ -1,7 +1,11 @@
-# Agent-DID: Verifiable Identity for AI Agents
+# Agent-DID: The Identity Layer for AI Agents
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
+[![Works with LangChain](https://img.shields.io/badge/works%20with-LangChain-blue)](integrations/langchain/)
+[![Works with CrewAI](https://img.shields.io/badge/works%20with-CrewAI-orange)](integrations/crewai/)
+[![Works with Semantic Kernel](https://img.shields.io/badge/works%20with-Semantic%20Kernel-purple)](integrations/semantic-kernel/)
+[![Works with Microsoft Agent Framework](https://img.shields.io/badge/works%20with-MS%20Agent%20Framework-lightblue)](integrations/microsoft-agent-framework/)
 [![CI — TypeScript SDK](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci.yml/badge.svg)](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci.yml)
 [![CI — Python SDK](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci-python.yml/badge.svg)](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci-python.yml)
 [![CI — LangChain JS](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci-langchain-js.yml/badge.svg)](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci-langchain-js.yml)
@@ -11,15 +15,34 @@
 [![CI — Microsoft Agent Framework](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci-microsoft-agent-framework.yml/badge.svg)](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/ci-microsoft-agent-framework.yml)
 [![Contract Audit](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/contract-audit.yml/badge.svg)](https://github.com/edisonduran/Agent-citizen-identification/actions/workflows/contract-audit.yml)
 
-**Agent-DID** is an open standard and reference implementation for **cryptographic verifiable identity for autonomous AI agents**. It answers a critical question the industry has not yet solved: *how does an AI agent prove who it is, that it was not tampered with, and that its actions can be traced back to an auditable identity?*
+> **Give your AI agents a verifiable identity — in the framework you already use, with or without blockchain.**
 
-Built on W3C DID and Verifiable Credentials, Agent-DID provides a language-agnostic specification ([RFC-001](docs/RFC-001-Agent-DID-Specification.md)) and production-ready SDKs for TypeScript and Python, with integrations for every major AI agent framework: LangChain, CrewAI, Semantic Kernel, and Microsoft Agent Framework.
+**Agent-DID** is an open standard and reference implementation that answers the question the AI industry has systematically avoided: *when an autonomous agent acts — signs a request, delegates a task, modifies data — how does the system on the other side know who that agent really is?*
 
-Agent-DID fills a gap left open by Google A2A and Anthropic MCP: neither defines how an agent *proves its own identity* across trust boundaries.
+OAuth delegates this to a centralized provider. MCP ignores it by design. Agent-DID solves it at the cryptographic level, with zero lock-in and native integration in every major AI orchestration framework.
+
+Built on W3C DID and Verifiable Credentials, Agent-DID provides:
+
+- **A language-agnostic specification** ([RFC-001](docs/RFC-001-Agent-DID-Specification.md)) — 11/11 MUST conformant
+- **Production-ready SDKs** for TypeScript and Python
+- **Native integrations** for LangChain (JS + Python), CrewAI, Semantic Kernel, and Microsoft Agent Framework
+- **Flexible trust anchoring** — on-chain (EVM) for immutability, or web-based (`did:wba`) for zero-friction adoption
+
+> For the conceptual foundation behind these design choices, see [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md).
 
 ---
 
-Reference project for the **Agent-DID (RFC-001)** standard: decentralized identity for AI agents with cryptographic signing, document resolution, revocation, and evolution traceability.
+## Why Agent-DID
+
+| Problem | What Agent-DID provides |
+|---|---|
+| MCP and A2A don't define agent identity | Cryptographic DID anchored to the agent's model, prompt, and capabilities |
+| Blockchain is required friction for most developers | `did:wba` method: identity without gas fees or wallets |
+| Identity is a separate concern from the AI framework | Native wrappers that inject identity into LangChain, CrewAI, SK, and MAF |
+| Agent actions are unauditable | Ed25519-signed HTTP requests — every action traceable to a verifiable DID |
+| Rogue agents can't be stopped globally | On-chain revocation propagates instantly across all resolvers |
+
+---
 
 Documentation governance for live project status and canonical sources of truth is defined in [docs/Documentation-Governance.md](docs/Documentation-Governance.md).
 
@@ -165,6 +188,7 @@ By default the audit gate is strict: any unmatched finding at severity `Low` or 
 
 ## Key Documentation
 
+- **Conceptual philosophy & vision**: [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md)
 - Main specification: [docs/RFC-001-Agent-DID-Specification.md](docs/RFC-001-Agent-DID-Specification.md)
 - Compliance checklist: [docs/RFC-001-Compliance-Checklist.md](docs/RFC-001-Compliance-Checklist.md)
 - Implementation backlog: [docs/RFC-001-Implementation-Backlog.md](docs/RFC-001-Implementation-Backlog.md)
