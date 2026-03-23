@@ -2629,7 +2629,7 @@ Solo dos tipos de cuenta pueden revocar: el owner directo o un delegate autoriza
 | MUST-02 | Soportar `create(params)` | `AgentIdentity.ts` |
 | MUST-03 | Soportar `signMessage(payload, privateKey)` | `AgentIdentity.ts` |
 | MUST-04 | Soportar `signHttpRequest(params)` con componentes requeridos | `AgentIdentity.ts`, tests positivos/negativos |
-| MUST-05 | Soportar `resolve(did)` | `UniversalResolverClient.ts`, HTTP/JSON-RPC sources |
+| MUST-05 | Soportar `resolve(did)` | `UniversalResolverClient.ts`, HTTP/JSON-RPC sources, resolución directa de `did:wba` |
 | MUST-06 | Soportar `verifySignature` y fallar si revocado | `AgentIdentity.ts`, tests |
 | MUST-07 | Soportar `revokeDid(did)` | `AgentIdentity.ts`, registries |
 | MUST-08 | Registry con operaciones mínimas | `AgentRegistry.sol`, SDK registries |
@@ -2641,7 +2641,7 @@ Solo dos tipos de cuenta pueden revocar: el owner directo o un delegate autoriza
 
 | ID | Control | Qué resuelve |
 |---|---|---|
-| **SHOULD-01** | Resolver universal serverless con caché y alta disponibilidad | Que la resolución de DIDs funcione en producción con failover y caché TTL |
+| **SHOULD-01** | Resolver universal serverless con caché y alta disponibilidad | Que la resolución de DIDs funcione en producción con failover, caché TTL y resolución web directa de `did:wba` |
 | **SHOULD-02** | Normalización temporal homogénea | Que la hora sea la misma sin importar si la lees del blockchain (Unix timestamp) o del SDK (ISO-8601). Implementado en `time.ts` |
 | **SHOULD-03** | Modo de verificación interoperable | Que firmas generadas por el SDK TypeScript puedan ser verificadas por implementaciones en otros lenguajes. Asegurado con vectores compartidos en `interop-vectors.json` |
 | **SHOULD-04** | Políticas de control de acceso para revocación | Que no cualquiera pueda revocar cualquier agente. El contrato implementa owner + delegates con `_isAuthorizedRevoker` |
@@ -4457,7 +4457,7 @@ Este comando ejecuta `scripts/conformance-rfc001.js`, que realiza:
 | MUST-02 | Operación `create(params)` | PASS | `AgentIdentity.ts` |
 | MUST-03 | `signMessage(payload, privateKey)` | PASS | `AgentIdentity.ts` |
 | MUST-04 | `signHttpRequest()` con RFC 9421 (`@request-target`, `host`, `date`, `content-digest`, identity) | PASS | Tests positivos/negativos, tamper, múltiples firmas |
-| MUST-05 | `resolve(did)` con múltiples fuentes | PASS | HTTP failover, IPFS gateways, JSON-RPC failover |
+| MUST-05 | `resolve(did)` con múltiples fuentes | PASS | HTTP failover, IPFS gateways, JSON-RPC failover, resolución directa de `did:wba` |
 | MUST-06 | `verifySignature()` + fallo si revocado | PASS | Tests con `keyId` y rotación |
 | MUST-07 | `revokeDid(did)` | PASS | Registry + contract |
 | MUST-08 | Registry mínimo (`registerAgent`, `revokeAgent`, `getAgentRecord`, `isRevoked`) | PASS | `AgentRegistry.sol`, SDK registry |
@@ -4469,7 +4469,7 @@ Este comando ejecuta `scripts/conformance-rfc001.js`, que realiza:
 
 | ID | Control | Estado | Evidencia clave |
 |----|---------|--------|-----------------|
-| SHOULD-01 | Resolver universal con cache y alta disponibilidad | PASS | `UniversalResolverClient.ts`, failover HTTP + RPC, HA runbook |
+| SHOULD-01 | Resolver universal con cache y alta disponibilidad | PASS | `UniversalResolverClient.ts`, failover HTTP + RPC, resolución directa de `did:wba`, HA runbook |
 | SHOULD-02 | Normalización temporal homogénea SDK ↔ contrato | PASS | `time.ts`, Unix on-chain → ISO en SDK |
 | SHOULD-03 | Verificación interoperable con implementaciones externas | PASS | `interop-vectors.json`, `InteropVectors.test.ts` |
 | SHOULD-04 | Políticas de control de acceso para revocación | PASS | `setRevocationDelegate`, `transferAgentOwnership`, `revocation-policy-check.js` |
