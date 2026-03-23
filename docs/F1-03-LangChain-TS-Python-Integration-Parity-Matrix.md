@@ -61,6 +61,7 @@ La parity de integracion se define en cinco dimensiones:
 | Ejemplo de observabilidad | `agentDidLangChain.observability.example.js` | `agent_did_langchain_observability_example.py` | ✅ | Parity operativa minima lograda. |
 | Receta tipo produccion | `agentDidLangChain.productionRecipe.example.js` | `agent_did_langchain_production_recipe_example.py` | ✅ | Ambos usan guardas de entorno. |
 | Demo integrado `did:wba` | `agentDidLangChain.didWbaDemo.example.js` | `agent_did_langchain_did_wba_demo.py` | ✅ | Ambos muestran runtime `did:wba`, partner remoto `did:wba`, `createAgent`/`create_agent` local y firma HTTP verificable sin credenciales externas. |
+| Smoke cross-package `did:wba` | `npm run smoke:langchain-didwba` ejecuta el demo JavaScript publicado y valida su contrato JSON. | El mismo comando ejecuta el demo Python publicado y valida su contrato JSON en la misma corrida. | ✅ | Este smoke es gate de parity operativa entre ambos demos, no solo una conveniencia local. |
 | Integracion LangSmith dedicada | `createLangSmithRunTree(...)` + `createLangSmithEventHandler(...)` | Adapter dedicado disponible | ✅ | Ambos paquetes exponen adaptador dedicado sin cambiar la factory principal. |
 | Profundidad de suite automatizada | tests funcionales, seguridad y observabilidad | tests funcionales, seguridad, observabilidad y modulos internos | ⚠️ | Python sigue mas granular. |
 
@@ -86,6 +87,7 @@ La parity de integracion se define en cinco dimensiones:
 2. Los defaults de seguridad deben seguir alineados.
 3. La taxonomia de eventos de observabilidad debe seguir equivalente.
 4. Si se agrega un demo integrado relevante en una integracion, la otra debe ofrecer un demo equivalente o documentar explicitamente la divergencia.
+5. Si cambia el contrato de salida o la ruta de ejecucion del demo integrado `did:wba`, el smoke cross-package y el walkthrough canonico deben actualizarse en el mismo cambio.
 
 ---
 
@@ -99,6 +101,7 @@ La parity de integracion se define en cinco dimensiones:
 4. TS ya tiene ejemplos adicionales para observabilidad y receta de produccion.
 5. README y ejemplos de TS quedan alineados con la narrativa de Python.
 6. TS y Python ya exponen demos integrados equivalentes para el flujo `did:wba` con resolucion web y firma HTTP verificable.
+7. El repositorio ya tiene un smoke cross-package que ejecuta ambos demos y valida su contrato operativo compartido.
 
 ### Gaps abiertos no bloqueantes
 

@@ -196,6 +196,7 @@ Checklist:
 - [ ] `.github/workflows/ci.yml` remains green for relevant TypeScript changes.
 - [ ] `.github/workflows/ci-python.yml` remains green for relevant Python changes.
 - [ ] `.github/workflows/ci-langchain-python.yml` remains green for relevant LangChain Python changes.
+- [ ] `.github/workflows/ci-langchain-didwba-smoke.yml` remains green when `did:wba` demos, SDKs or LangChain integrations change.
 - [ ] `.github/workflows/ci-integration-governance.yml` remains green when integration packages or their governance docs change.
 - [ ] If fixtures changed, both workflows were considered part of the validation surface.
 
@@ -210,6 +211,7 @@ npm run python:install-dev
 npm run python:test
 npm run python:conformance
 npm run test:langchain
+npm run smoke:langchain-didwba
 npm run langchain-python:install-dev
 npm run lint:langchain-python
 npm run typecheck:langchain-python

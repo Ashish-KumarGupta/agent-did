@@ -182,6 +182,7 @@ If you are working on the LangChain package, also run:
 
 ```bash
 npm run test:langchain
+npm run smoke:langchain-didwba
 ```
 
 If you are working on the LangChain Python package, the canonical local workflow is:
@@ -241,6 +242,7 @@ By default the audit gate is strict: any unmatched finding at severity `Low` or 
 - Compliance checklist: [docs/RFC-001-Compliance-Checklist.md](docs/RFC-001-Compliance-Checklist.md)
 - Implementation backlog: [docs/RFC-001-Implementation-Backlog.md](docs/RFC-001-Implementation-Backlog.md)
 - TS ↔ Python parity matrix: [docs/F2-01-TS-Python-Parity-Matrix.md](docs/F2-01-TS-Python-Parity-Matrix.md)
+- LangChain `did:wba` demo walkthrough: [docs/F1-03-LangChain-didwba-Demo-Walkthrough.md](docs/F1-03-LangChain-didwba-Demo-Walkthrough.md)
 - SDK release checklist: [docs/SDK-Release-Checklist.md](docs/SDK-Release-Checklist.md)
 - LangChain Python technical plan: [docs/F1-03-LangChain-Python-Technical-Plan.md](docs/F1-03-LangChain-Python-Technical-Plan.md)
 - Resolver HA runbook: [docs/RFC-001-Resolver-HA-Runbook.md](docs/RFC-001-Resolver-HA-Runbook.md)
@@ -277,6 +279,7 @@ Current CI split in GitHub Actions:
 - `CI — LangChain JS Integration`: dedicated Node validation for `integrations/langchain/` against the local `sdk/`.
 - `CI — Python SDK & RFC-001 Conformance`: Python-native quality gates for `sdk-python/`, including conformance and Python smoke coverage on the primary runtime.
 - `CI — LangChain Python Integration`: dedicated validation for `integrations/langchain-python/`.
+- `CI — LangChain did:wba Demo Smoke`: cross-package smoke that executes the shipped JavaScript and Python integrated demos together.
 - `CI - Semantic Kernel Integration`: dedicated validation for `integrations/semantic-kernel/`.
 - `CI — Microsoft Agent Framework Integration`: dedicated validation for `integrations/microsoft-agent-framework/`.
 - `Contract Audit`: Slither/Mythril security audit pipeline for `contracts/`.
