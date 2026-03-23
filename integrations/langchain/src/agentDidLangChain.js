@@ -1,4 +1,4 @@
-const { AgentIdentity } = require("@agent-did/sdk");
+const { AgentIdentity } = require("@agentdid/sdk");
 const net = require("node:net");
 const { SystemMessage } = require("@langchain/core/messages");
 const { tool } = require("@langchain/core/tools");

@@ -1,5 +1,5 @@
 const { ethers } = require("ethers");
-const { AgentIdentity } = require("@agent-did/sdk");
+const { AgentIdentity } = require("@agentdid/sdk");
 const {
   composeEventHandlers,
   createAgentDidIntegration,
