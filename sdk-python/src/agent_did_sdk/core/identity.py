@@ -295,7 +295,7 @@ class AgentIdentity:
             # Rebuild signature base including nonce
             sig_base = cls._build_http_signature_base(
                 method=params.method, url=params.url, date_header=date_header,  # type: ignore[arg-type]
-                content_digest=digest_header, nonce=nonce_header  # type: ignore[arg-type]
+                content_digest=digest_header, nonce=nonce_header,
             )
 
             sig_hex = bytes(base64.b64decode(sig_b64)).hex()
