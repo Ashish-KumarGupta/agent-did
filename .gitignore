@@ -21,3 +21,7 @@ _bmad-output/
 .github/*
 !.github/workflows/
 !.github/workflows/**
+!.github/assets/
+.github/assets/*
+!.github/assets/social-preview/
+!.github/assets/social-preview/**
