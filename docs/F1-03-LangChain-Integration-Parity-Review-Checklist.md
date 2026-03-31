@@ -94,6 +94,7 @@ Parity verification is complete when:
 
 | Date | Change |
 |------|--------|
+| 2026-03-31 | Repository slug updated to `agent-did` and active LangChain TS/Python package references normalized to `@agentdid/*` in README/examples/metadata. No functional changes to the integration surface; parity artifacts refreshed for governance compliance. |
 | 2026-03-23 | Added a canonical walkthrough and a cross-package `did:wba` demo smoke gate so parity review also covers executable demo behavior. |
 | 2026-03-22 | Added explicit parity review gate for integrated `did:wba` demos and refreshed the parity matrix after shipping mirrored LangChain TS/Python demos. |
 | 2026-03-22 | Repository license migrated from MIT to Apache-2.0. `pyproject.toml` and `package.json` updated accordingly. No functional changes to the integration surface. |

@@ -127,6 +127,7 @@ La parity de integraciones LangChain TS vs Python se considera mantenida cuando:
 
 | Fecha | Cambio |
 |-------|--------|
+| 2026-03-31 | Rename del repositorio a `agent-did` y normalizacion de metadata publica para LangChain TS/Python: URLs de GitHub, referencias de instalacion y ejemplos activos alineados con `@agentdid/sdk` y `@agentdid/langchain`. Sin cambios en la API publica ni en la parity funcional. |
 | 2026-03-22 | Se agregaron demos integrados `did:wba` equivalentes para LangChain TS y Python, junto con cobertura automatizada y referencias en README. La parity de ejemplos operativos se mantiene. |
 | 2026-03-22 | Licencia del repositorio migrada de MIT a Apache-2.0. Actualizado `package.json` (langchain TS) y `pyproject.toml` (langchain-python). Sin cambios funcionales en la superficie de integración. |
 | 2026-03-22 | Rename de scope npm: `@agent-did/langchain` → `@agentdid/langchain` y `@agent-did/sdk` → `@agentdid/sdk` para alinear con la organización npm `@agentdid`. Sin cambios en la API pública ni en la lógica funcional. |

@@ -81,4 +81,5 @@ Semantic Kernel review is complete when the scaffold state is accurately describ
 
 | Date | Change |
 |------|--------|
+| 2026-03-31 | Repository slug updated to `agent-did` and Semantic Kernel package metadata refreshed to the new GitHub URL and project branding. Review artifacts updated to record that the change is packaging/governance-only, with no functional integration drift. |
 | 2026-03-22 | Repository license migrated from MIT to Apache-2.0. `pyproject.toml` updated accordingly. No functional changes to the integration surface. |

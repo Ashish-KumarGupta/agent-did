@@ -87,4 +87,5 @@ F2-04 is implementation-ready for release review when the package has a function
 
 | Date | Change |
 |------|--------|
+| 2026-03-31 | Repository slug updated to `agent-did` and Semantic Kernel package metadata aligned to the new GitHub URL and `Agent-DID contributors` branding. No runtime, tool, middleware or API surface changes. |
 | 2026-03-22 | Repository license migrated from MIT to Apache-2.0. `pyproject.toml` updated accordingly. No functional changes to the integration surface. |
