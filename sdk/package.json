@@ -34,12 +34,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/edisonduran/Agent-citizen-identification.git",
+    "url": "https://github.com/edisonduran/agent-did.git",
     "directory": "sdk"
   },
-  "homepage": "https://github.com/edisonduran/Agent-citizen-identification#readme",
+  "homepage": "https://github.com/edisonduran/agent-did#readme",
   "bugs": {
-    "url": "https://github.com/edisonduran/Agent-citizen-identification/issues"
+    "url": "https://github.com/edisonduran/agent-did/issues"
   },
   "engines": {
     "node": ">=18.0.0"

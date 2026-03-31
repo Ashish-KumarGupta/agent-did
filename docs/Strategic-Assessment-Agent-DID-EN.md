@@ -1,7 +1,7 @@
 # Strategic Assessment and Roadmap — Agent-DID
 
 **Document type:** Strategic Assessment & Roadmap  
-**Project:** Agent-citizen-identification (Agent-DID)  
+**Project:** Agent-DID  
 **Date:** 2026-02-28  
 **Author:** Automated assessment (GitHub Copilot)  
 **Version:** 1.0
@@ -198,7 +198,7 @@ The project occupies a strategic space of very high value with virtually no dire
 
 | # | Action | Type | Expected impact |
 |---|---|---|---|
-| F1-01 | Publish SDK on npm as `@agent-did/sdk` open-source | Technical | Visibility + organic adoption |
+| F1-01 | Publish SDK on npm as `@agentdid/sdk` open-source | Technical | Visibility + organic adoption |
 | F1-02 | Translate README and key docs to English | Documentation | Global reach |
 | F1-03 | Deliver LangChain integration that injects Agent-DID identity | Integration | Access to the largest agent ecosystem |
 | F1-04 | Submit RFC-001 to DIF (Decentralized Identity Foundation) | Standards | Institutional credibility |
@@ -284,5 +284,5 @@ The 3-phase roadmap prioritizes exactly the moves needed to convert technical ad
 
 ---
 
-*Document generated as a planning artifact for the Agent-citizen-identification project.*  
+*Document generated as a planning artifact for the Agent-DID project.*  
 *Suggested next review: at Phase 1 close (May 2026).*

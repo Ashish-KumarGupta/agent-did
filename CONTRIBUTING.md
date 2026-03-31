@@ -2,7 +2,7 @@
 
 Thank you for considering contributing to Agent-DID! We are building the foundational identity layer for the AI economy, and every contribution matters.
 
-> **Project status:** The TypeScript SDK is published (`@agent-did/sdk`), the Python SDK is implemented with dedicated CI in `sdk-python/`, RFC-001 is fully conformant (11/11 MUST + 5/5 SHOULD), and the EVM smart contract is functional. See the [Roadmap](#roadmap--where-to-contribute) below for what's next.
+> **Project status:** The TypeScript SDK is published (`@agentdid/sdk`), the Python SDK is implemented with dedicated CI in `sdk-python/`, RFC-001 is fully conformant (11/11 MUST + 5/5 SHOULD), and the EVM smart contract is functional. See the [Roadmap](#roadmap--where-to-contribute) below for what's next.
 
 ---
 
@@ -57,8 +57,8 @@ The project follows a 3-phase roadmap. Items marked with **🔓 Open** are activ
 
 | # | Item | Type | Status |
 |---|---|---|---|
-| F1-01 | Publish SDK to npm as `@agent-did/sdk` | Technical | ✅ Done |
-| F1-02 | Translate all docs to English | Documentation | ✅ Done |
+| F1-01 | Publish SDK to npm as `@agentdid/sdk` | Technical | ✅ Done |
+| F1-02 | Translate README and key docs to English | Documentation | ✅ Done |
 | F1-03 | **LangChain integration** — inject Agent-DID identity into agent chains | Integration | ✅ Done |
 | F1-04 | **Submit RFC-001 to DIF** (Decentralized Identity Foundation) | Standards | 🔓 Open |
 | F1-05 | **Automated smart contract audit** (Slither/Mythril) | Security | ✅ Done |
@@ -107,8 +107,8 @@ The implemented LangChain package lives in [integrations/langchain/README.md](in
 
 ```bash
 # Clone and install
-git clone https://github.com/edisonduran/Agent-citizen-identification.git
-cd Agent-citizen-identification
+git clone https://github.com/edisonduran/agent-did.git
+cd agent-did
 npm install
 npm --prefix sdk install
 npm --prefix contracts install

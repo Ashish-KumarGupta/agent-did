@@ -1,6 +1,6 @@
 const { ethers } = require("ethers");
 const { createAgent } = require("langchain");
-const { AgentIdentity } = require("@agent-did/sdk");
+const { AgentIdentity } = require("@agentdid/sdk");
 const { createAgentDidIntegration } = require("../src");
 
 async function main() {

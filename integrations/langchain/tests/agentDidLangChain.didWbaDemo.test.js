@@ -66,7 +66,7 @@ function buildPartnerDocument() {
   };
 }
 
-describe("@agent-did/langchain did:wba integrated demo", () => {
+describe("@agentdid/langchain did:wba integrated demo", () => {
   it("supports an active did:wba runtime, partner resolution, and verifiable HTTP signing", async () => {
     const signer = ethers.Wallet.createRandom();
     const registry = new InMemoryAgentRegistry();

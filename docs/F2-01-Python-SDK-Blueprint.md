@@ -1,7 +1,7 @@
 # F2-01 — Python SDK Blueprint & Construction Checklist
 
 **Tipo:** Guía de construcción (GPS)  
-**Proyecto:** Agent-citizen-identification  
+**Proyecto:** Agent-DID  
 **Feature:** F2-01 — SDK Python con paridad de funcionalidad  
 **Fecha de creación:** 2026-03-21  
 **Última actualización:** 2026-03-21  
@@ -59,7 +59,7 @@ Construir un SDK Python que ofrezca **paridad funcional completa** con el SDK Ty
 | **Async pattern** | `async/await` nativo | Todas las operaciones I/O son async; se puede usar `asyncio.run()` como facade sync |
 | **Testing** | `pytest` + `pytest-asyncio` | Estándar de la industria Python |
 | **Build/Publish** | `pyproject.toml` + `hatchling` | PEP 621 moderno, sin `setup.py` |
-| **Nombre del paquete** | `agent-did-sdk` (PyPI: `agent-did-sdk`) | Consistente con `@agent-did/sdk` en npm |
+| **Nombre del paquete** | `agent-did-sdk` (PyPI: `agent-did-sdk`) | Consistente con `@agentdid/sdk` en npm |
 | **Multibase encoding** | `bases` o manual z-prefix + hex | Para claves públicas Ed25519 |
 
 ---
@@ -574,5 +574,5 @@ Cada fase es autocontenida y testeable independientemente. Las dependencias van 
 
 ---
 
-*Documento creado como planning artifact del proyecto Agent-citizen-identification.*  
+*Documento creado como planning artifact del proyecto Agent-DID.*  
 *Actualizar el checklist de la Sección 6 a medida que avanza la implementación.*

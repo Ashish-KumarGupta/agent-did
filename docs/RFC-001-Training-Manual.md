@@ -171,13 +171,13 @@ A DID Document is a JSON-LD structure that describes the agent's identity:
 ### Installation
 
 ```bash
-npm install @agent-did/sdk
+npm install @agentdid/sdk
 ```
 
 ### Core Class: `AgentIdentity`
 
 ```typescript
-import { AgentIdentity } from '@agent-did/sdk';
+import { AgentIdentity } from '@agentdid/sdk';
 ```
 
 #### `AgentIdentity.create(options)`
@@ -288,7 +288,7 @@ await agent.updateDidDocument({
 ### Production Configuration
 
 ```typescript
-import { UniversalResolverClient } from '@agent-did/sdk';
+import { UniversalResolverClient } from '@agentdid/sdk';
 
 const resolver = new UniversalResolverClient({
   sources: [

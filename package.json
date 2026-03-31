@@ -1,12 +1,12 @@
 {
-  "name": "agent-citizen-identification",
+  "name": "agent-did",
   "private": true,
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/edisonduran/Agent-citizen-identification.git"
+    "url": "https://github.com/edisonduran/agent-did.git"
   },
-  "homepage": "https://github.com/edisonduran/Agent-citizen-identification#readme",
+  "homepage": "https://github.com/edisonduran/agent-did#readme",
   "scripts": {
     "audit:contracts": "node scripts/contract-audit.js",
     "build:crewai": "cd integrations/crewai && python -m build",

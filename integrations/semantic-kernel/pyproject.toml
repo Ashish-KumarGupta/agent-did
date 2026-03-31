@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
-  { name = "Agent-citizen-identification contributors" }
+  { name = "Agent-DID contributors" }
 ]
 keywords = ["agent-did", "semantic-kernel", "python", "did", "identity", "tool-calling"]
 classifiers = [
@@ -47,8 +47,8 @@ runtime = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/edisonduran/Agent-citizen-identification"
-Repository = "https://github.com/edisonduran/Agent-citizen-identification"
+Homepage = "https://github.com/edisonduran/agent-did"
+Repository = "https://github.com/edisonduran/agent-did"
 
 [tool.setuptools.packages.find]
 where = ["src"]

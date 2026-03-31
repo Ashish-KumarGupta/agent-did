@@ -2,10 +2,11 @@ Metadata-Version: 2.4
 Name: agent-did-sdk
 Version: 0.1.0
 Summary: Python SDK for the Agent-DID Specification (RFC-001) — create, sign, resolve, verify and revoke Agent-DIDs
-Author: Agent-citizen-identification contributors
-License-Expression: MIT
-Project-URL: Homepage, https://github.com/agent-citizen-identification
-Project-URL: Repository, https://github.com/agent-citizen-identification
+Author: Agent-DID contributors
+License-Expression: Apache-2.0
+Project-URL: Homepage, https://github.com/edisonduran/agent-did#readme
+Project-URL: Repository, https://github.com/edisonduran/agent-did.git
+Project-URL: Bug-Tracker, https://github.com/edisonduran/agent-did/issues
 Keywords: did,agent,identity,decentralized,web3,ai
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Developers
@@ -34,7 +35,9 @@ Dynamic: license-file
 
 Python SDK for the **Agent-DID Specification (RFC-001)** — create, sign, resolve, verify and revoke Agent-DIDs.
 
-Functional parity with the TypeScript SDK (`@agent-did/sdk`), with a dedicated Python CI pipeline and shared interoperability fixtures.
+Functional parity with the TypeScript SDK (`@agentdid/sdk`), with a dedicated Python CI pipeline and shared interoperability fixtures.
+
+Formal parity tracking is documented in `../docs/F2-01-TS-Python-Parity-Matrix.md`.
 
 Pythonic surface conventions apply:
 
@@ -155,6 +158,8 @@ AgentIdentity.use_production_resolver_from_http(
 )
 ```
 
+Minimal `did:wba` example: `examples/did_wba_resolution.py`
+
 ## Testing
 
 Canonical local workflow:
@@ -204,4 +209,4 @@ python scripts/e2e_smoke.py
 
 ## License
 
-MIT
+[Apache-2.0](../LICENSE) — see root LICENSE.

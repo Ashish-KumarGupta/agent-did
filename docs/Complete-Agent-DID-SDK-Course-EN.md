@@ -1210,7 +1210,7 @@ This is probably **the most important question** you'll be asked in the communit
 #### Example with Real SDK Code — Creating an Agent:
 
 ```typescript
-import { AgentIdentity } from '@agent-did/sdk';
+import { AgentIdentity } from '@agentdid/sdk';
 
 const agent = await AgentIdentity.create({
   name: "TradingBot-v3",

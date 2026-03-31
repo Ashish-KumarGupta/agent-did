@@ -10,7 +10,7 @@ readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
 authors = [
-  { name = "Agent-citizen-identification contributors" },
+  { name = "Agent-DID contributors" },
 ]
 keywords = ["did", "agent", "identity", "decentralized", "web3", "ai"]
 classifiers = [
@@ -41,9 +41,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/edisonduran/Agent-citizen-identification#readme"
-Repository = "https://github.com/edisonduran/Agent-citizen-identification.git"
-Bug-Tracker = "https://github.com/edisonduran/Agent-citizen-identification/issues"
+Homepage = "https://github.com/edisonduran/agent-did#readme"
+Repository = "https://github.com/edisonduran/agent-did.git"
+Bug-Tracker = "https://github.com/edisonduran/agent-did/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

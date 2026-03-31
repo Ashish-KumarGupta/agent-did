@@ -1,4 +1,4 @@
-# @agent-did/langchain
+# @agentdid/langchain
 
 Integracion funcional de Agent-DID para LangChain JS 1.x.
 
@@ -10,7 +10,7 @@ La matriz de parity entre ambas integraciones vive en `../../docs/F1-03-LangChai
 
 - `langchain` `^1.2.35`
 - `@langchain/core` `^1.1.34`
-- `@agent-did/sdk` `^0.1.0`
+- `@agentdid/sdk` `^0.1.0`
 - Node.js 20+
 
 ## Estado
@@ -23,7 +23,7 @@ La matriz de parity entre ambas integraciones vive en `../../docs/F1-03-LangChai
 ## Instalacion
 
 ```bash
-npm install @agent-did/sdk langchain @langchain/core zod
+npm install @agentdid/sdk langchain @langchain/core zod
 ```
 
 Para habilitar el adaptador opcional de LangSmith:
@@ -35,7 +35,7 @@ npm install langsmith
 Si publicas este paquete por separado:
 
 ```bash
-npm install @agent-did/langchain
+npm install @agentdid/langchain
 ```
 
 ## Uso rapido
@@ -43,8 +43,8 @@ npm install @agent-did/langchain
 ```ts
 import { ethers } from "ethers";
 import { createAgent } from "langchain";
-import { AgentIdentity } from "@agent-did/sdk";
-import { createAgentDidIntegration } from "@agent-did/langchain";
+import { AgentIdentity } from "@agentdid/sdk";
+import { createAgentDidIntegration } from "@agentdid/langchain";
 
 const signer = new ethers.Wallet(process.env.CREATOR_PRIVATE_KEY!);
 const identity = new AgentIdentity({ signer, network: "polygon" });
@@ -117,7 +117,7 @@ const {
   composeEventHandlers,
   createAgentDidIntegration,
   createJsonLoggerEventHandler,
-} = require("@agent-did/langchain");
+} = require("@agentdid/langchain");
 
 const events = [];
 
@@ -166,7 +166,7 @@ const {
   createAgentDidIntegration,
   createLangSmithEventHandler,
   createLangSmithRunTree,
-} = require("@agent-did/langchain");
+} = require("@agentdid/langchain");
 
 const rootRun = createLangSmithRunTree({
   name: "agent_did_demo",

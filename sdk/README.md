@@ -1,10 +1,10 @@
-# @agent-did/sdk
+# @agentdid/sdk
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4+-blue)](https://www.typescriptlang.org/)
 
-Verifiable decentralized identity for autonomous AI agents. Create, sign, resolve, and verify Agent-DIDs based on [RFC-001](https://github.com/edisonduran/Agent-citizen-identification/blob/main/docs/RFC-001-Agent-DID-Specification.md).
+Verifiable decentralized identity for autonomous AI agents. Create, sign, resolve, and verify Agent-DIDs based on [RFC-001](https://github.com/edisonduran/agent-did/blob/main/docs/RFC-001-Agent-DID-Specification.md).
 
 > **SDK en TypeScript para identidad descentralizada verificable de agentes de IA autónomos.**
 
@@ -26,7 +26,7 @@ Agent-DID solves this with:
 ## Installation
 
 ```bash
-npm install @agent-did/sdk ethers
+npm install @agentdid/sdk ethers
 ```
 
 Requires **Node.js 18+**.
@@ -34,7 +34,7 @@ Requires **Node.js 18+**.
 ## Quick Start
 
 ```ts
-import { AgentIdentity } from '@agent-did/sdk';
+import { AgentIdentity } from '@agentdid/sdk';
 import { ethers } from 'ethers';
 
 // 1. Create an agent identity
@@ -82,7 +82,7 @@ await AgentIdentity.revokeDid(document.id);
 Connect to a real on-chain `AgentRegistry` contract:
 
 ```ts
-import { EthersAgentRegistryContractClient, EvmAgentRegistry } from '@agent-did/sdk';
+import { EthersAgentRegistryContractClient, EvmAgentRegistry } from '@agentdid/sdk';
 import { ethers } from 'ethers';
 
 const provider = new ethers.JsonRpcProvider('http://localhost:8545');
@@ -95,14 +95,14 @@ const registry = new EvmAgentRegistry(client);
 AgentIdentity.setRegistry(registry);
 ```
 
-See full example: [`examples/evm-registry-wiring.ts`](https://github.com/edisonduran/Agent-citizen-identification/blob/main/sdk/examples/evm-registry-wiring.ts)
+See full example: [`examples/evm-registry-wiring.ts`](https://github.com/edisonduran/agent-did/blob/main/sdk/examples/evm-registry-wiring.ts)
 
 ## Production Resolver
 
 Configure a production-grade resolver with failover and caching:
 
 ```ts
-import { AgentIdentity } from '@agent-did/sdk';
+import { AgentIdentity } from '@agentdid/sdk';
 
 // HTTP resolver with IPFS gateway failover
 AgentIdentity.useProductionResolverFromHttp({
@@ -161,7 +161,7 @@ HTTP signatures include `created`, `expires`, and a random `nonce`. Verifiers SH
 
 ## Specification
 
-This SDK implements [RFC-001: Agent-DID Specification](https://github.com/edisonduran/Agent-citizen-identification/blob/main/docs/RFC-001-Agent-DID-Specification.md) — a standard for decentralized AI agent identity extending W3C DIDs with agent-specific metadata.
+This SDK implements [RFC-001: Agent-DID Specification](https://github.com/edisonduran/agent-did/blob/main/docs/RFC-001-Agent-DID-Specification.md) — a standard for decentralized AI agent identity extending W3C DIDs with agent-specific metadata.
 
 **Conformance:** 11/11 MUST PASS + 5/5 SHOULD PASS
 
@@ -173,7 +173,7 @@ This SDK implements [RFC-001: Agent-DID Specification](https://github.com/edison
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/edisonduran/Agent-citizen-identification/blob/main/CONTRIBUTING.md)
+See [CONTRIBUTING.md](https://github.com/edisonduran/agent-did/blob/main/CONTRIBUTING.md)
 
 ## License
 

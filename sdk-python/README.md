@@ -2,7 +2,7 @@
 
 Python SDK for the **Agent-DID Specification (RFC-001)** — create, sign, resolve, verify and revoke Agent-DIDs.
 
-Functional parity with the TypeScript SDK (`@agent-did/sdk`), with a dedicated Python CI pipeline and shared interoperability fixtures.
+Functional parity with the TypeScript SDK (`@agentdid/sdk`), with a dedicated Python CI pipeline and shared interoperability fixtures.
 
 Formal parity tracking is documented in `../docs/F2-01-TS-Python-Parity-Matrix.md`.
 

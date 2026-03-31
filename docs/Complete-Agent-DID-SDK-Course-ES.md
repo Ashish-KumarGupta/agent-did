@@ -1131,7 +1131,7 @@ Esta es probablemente **la pregunta más importante** que te harán en la comuni
 #### Ejemplo con código real del SDK — Creación de un agente:
 
 ```typescript
-import { AgentIdentity } from '@agent-did/sdk';
+import { AgentIdentity } from '@agentdid/sdk';
 
 const agent = await AgentIdentity.create({
   name: "TradingBot-v3",

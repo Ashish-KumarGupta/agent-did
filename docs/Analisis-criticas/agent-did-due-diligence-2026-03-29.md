@@ -1,6 +1,6 @@
 # Due diligence técnica y estratégica — Agent-DID
 
-**Proyecto analizado:** `edisonduran/Agent-citizen-identification`  
+**Proyecto analizado:** `edisonduran/agent-did`  
 **Fecha:** 2026-03-29  
 **Objetivo:** evaluar el proyecto como oportunidad técnica y estratégica, incluyendo comparables, calidad de implementación, riesgos y recomendaciones.
 
@@ -8,7 +8,7 @@
 
 # 1. Resumen ejecutivo
 
-🏷 **Proyecto:** Agent-DID (`edisonduran/Agent-citizen-identification`)  
+🏷 **Proyecto:** Agent-DID (`edisonduran/agent-did`)  
 ⭐️ **Score general inicial:** **7.2/10**  
 🎯 **Tesis:** busca resolver un problema real y subatendido: dar identidad verificable a agentes de IA que actúan autónomamente.  
 📊 **Mercado:** infraestructura de identidad, seguridad y auditabilidad para agentes AI; mercado potencialmente grande, pero aún inmaduro y fragmentado.  

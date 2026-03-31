@@ -9,7 +9,7 @@ const {
   serializeObservabilityEvent,
 } = require("../src");
 
-describe("@agent-did/langchain observability", () => {
+describe("@agentdid/langchain observability", () => {
   const signer = ethers.Wallet.createRandom();
   const agentIdentity = new AgentIdentity({ signer, network: "polygon" });
 

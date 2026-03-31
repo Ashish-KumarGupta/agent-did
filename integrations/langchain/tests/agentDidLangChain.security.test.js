@@ -2,7 +2,7 @@ const { ethers } = require("ethers");
 const { AgentIdentity, InMemoryAgentRegistry } = require("@agentdid/sdk");
 const { createAgentDidTools } = require("../src");
 
-describe("@agent-did/langchain security edge cases", () => {
+describe("@agentdid/langchain security edge cases", () => {
   const signer = ethers.Wallet.createRandom();
   const agentIdentity = new AgentIdentity({ signer, network: "polygon" });
 

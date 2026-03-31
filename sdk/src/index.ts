@@ -1,5 +1,5 @@
 /**
- * @agent-did/sdk
+ * @agentdid/sdk
  * The official TypeScript SDK for the Agent-DID Specification (RFC-001)
  * 
  * This SDK provides the core tools to create, sign, and verify Decentralized Identifiers

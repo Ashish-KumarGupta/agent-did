@@ -67,13 +67,13 @@ Given a sample DID Document, label each field and explain its purpose.
 ### 3.1 Installation
 
 ```bash
-npm install @agent-did/sdk
+npm install @agentdid/sdk
 ```
 
 ### 3.2 Create an Agent Identity
 
 ```typescript
-import { AgentIdentity } from '@agent-did/sdk';
+import { AgentIdentity } from '@agentdid/sdk';
 
 const agent = await AgentIdentity.create({
   name: 'CourseAgent',

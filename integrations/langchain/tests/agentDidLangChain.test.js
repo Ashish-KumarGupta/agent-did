@@ -5,7 +5,7 @@ const {
   createAgentDidIntegration,
 } = require("../src");
 
-describe("@agent-did/langchain", () => {
+describe("@agentdid/langchain", () => {
   const signer = ethers.Wallet.createRandom();
   const agentIdentity = new AgentIdentity({ signer, network: "polygon" });
 

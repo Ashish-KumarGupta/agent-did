@@ -1,7 +1,7 @@
 # Evaluación Estratégica y Hoja de Ruta — Agent-DID
 
 **Tipo de documento:** Strategic Assessment & Roadmap  
-**Proyecto:** Agent-citizen-identification (Agent-DID)  
+**Proyecto:** Agent-DID  
 **Fecha:** 2026-02-28  
 **Autor:** Evaluación automatizada (GitHub Copilot)  
 **Versión:** 1.0
@@ -198,7 +198,7 @@ El proyecto ocupa un espacio estratégico de altísimo valor y prácticamente si
 
 | # | Acción | Tipo | Impacto esperado |
 |---|---|---|---|
-| F1-01 | Publicar SDK en npm como `@agent-did/sdk` open-source | Técnico | Visibilidad + adopción orgánica |
+| F1-01 | Publicar SDK en npm como `@agentdid/sdk` open-source | Técnico | Visibilidad + adopción orgánica |
 | F1-02 | Traducir README y docs clave a inglés | Documentación | Alcance global |
 | F1-03 | Entregar integración para LangChain que inyecte identidad Agent-DID | Integración | Acceso al ecosistema de agentes más grande |
 | F1-04 | Someter RFC-001 a DIF (Decentralized Identity Foundation) | Estándares | Credibilidad institucional |
@@ -284,5 +284,5 @@ La hoja de ruta de 3 fases prioriza exactamente los movimientos necesarios para 
 
 ---
 
-*Documento generado como planning artifact del proyecto Agent-citizen-identification.*  
+*Documento generado como planning artifact del proyecto Agent-DID.*  
 *Próxima revisión sugerida: al cierre de Fase 1 (mayo 2026).*
