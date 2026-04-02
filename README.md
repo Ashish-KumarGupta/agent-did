@@ -34,13 +34,13 @@ Built on W3C DID and Verifiable Credentials, Agent-DID provides:
 
 ## Why Agent-DID
 
-| Problem | What Agent-DID provides |
+| Problem | What Agent-DID adds |
 |---|---|
-| MCP and A2A don't define agent identity | Cryptographic DID anchored to the agent's model, prompt, and capabilities |
-| Blockchain is required friction for most developers | `did:wba` method: identity without gas fees or wallets |
-| Identity is a separate concern from the AI framework | Native wrappers that inject identity into LangChain, CrewAI, SK, and MAF |
-| Agent actions are unauditable | Ed25519-signed HTTP requests — every action traceable to a verifiable DID |
-| Revoked or compromised agents are hard to stop consistently | On-chain revocation can propagate across compatible resolvers |
+| MCP, A2A, and agent frameworks do not provide portable, verifiable agent identity | A DID-based identity layer that binds controller, model and prompt fingerprints, and declared capabilities |
+| Requiring blockchain for every deployment slows adoption | Flexible trust anchoring: EVM when immutability matters, web-based DID methods such as `did:wba` when low friction matters |
+| Existing frameworks orchestrate behavior, not trust | Native integrations that add identity to LangChain, CrewAI, Semantic Kernel, and Microsoft Agent Framework without replacing them |
+| Agent actions are hard to attribute and verify | Ed25519 signing for payloads and HTTP requests, enabling verifiable actions and audit trails |
+| Revocation is inconsistent across environments | Compatible resolvers can propagate and enforce revocation state for compromised agents |
 
 ---
 
