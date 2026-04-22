@@ -18,6 +18,19 @@ from agent_did_microsoft_agent_framework.observability import (
 )
 
 
+def _extract_message_text(message: object) -> str:
+    contents = getattr(message, "contents", None)
+    if isinstance(contents, list) and contents:
+        first = contents[0]
+        if isinstance(first, str):
+            return first
+        text = getattr(first, "text", None)
+        if isinstance(text, str) and text:
+            return text
+    text = getattr(message, "text", None)
+    return text if isinstance(text, str) and text else "none"
+
+
 class DummyChatClient(BaseChatClient):
     def __init__(self, label: str):
         super().__init__()
@@ -27,9 +40,9 @@ class DummyChatClient(BaseChatClient):
         text = "none"
         if messages:
             last_message = messages[-1]
-            text = getattr(last_message, "text", None) or text
+            text = _extract_message_text(last_message)
         return ChatResponse(
-            messages=Message(role="assistant", text=f"{self.label}:{text}"),
+            messages=Message("assistant", [f"{self.label}:{text}"]),
             value=f"{self.label}:{text}",
         )
 
