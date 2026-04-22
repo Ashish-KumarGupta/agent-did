@@ -19,16 +19,22 @@ from agent_did_microsoft_agent_framework.observability import (
 
 
 def _extract_message_text(message: object) -> str:
-    contents = getattr(message, "contents", None)
-    if isinstance(contents, list) and contents:
-        first = contents[0]
-        if isinstance(first, str):
-            return first
-        text = getattr(first, "text", None)
-        if isinstance(text, str) and text:
-            return text
-    text = getattr(message, "text", None)
-    return text if isinstance(text, str) and text else "none"
+    legacy_text = getattr(message, "text", None)
+    if isinstance(legacy_text, str) and legacy_text:
+        return legacy_text
+
+    contents = getattr(message, "contents", None) or ()
+    text_parts: list[str] = []
+    for content in contents:
+        if isinstance(content, str):
+            text_parts.append(content)
+            continue
+
+        text_value = getattr(content, "text", None)
+        if isinstance(text_value, str) and text_value:
+            text_parts.append(text_value)
+
+    return "".join(text_parts) or "none"
 
 
 class DummyChatClient(BaseChatClient):
@@ -37,13 +43,12 @@ class DummyChatClient(BaseChatClient):
         self.label = label
 
     async def _inner_get_response(self, *, messages, stream, options, **kwargs):  # type: ignore[override]
-        text = "none"
-        if messages:
-            last_message = messages[-1]
-            text = _extract_message_text(last_message)
+        text = _extract_message_text(messages[-1]) if messages else "none"
+        response_text = f"{self.label}:{text}"
         return ChatResponse(
-            messages=Message("assistant", [f"{self.label}:{text}"]),
-            value=f"{self.label}:{text}",
+            messages=Message("assistant", [response_text]),
+            finish_reason="stop",
+            value=response_text,
         )
 
 
