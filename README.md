@@ -18,7 +18,7 @@
 [![Contract Audit](https://github.com/edisonduran/agent-did/actions/workflows/contract-audit.yml/badge.svg)](https://github.com/edisonduran/agent-did/actions/workflows/contract-audit.yml)
 [![Public Review](https://img.shields.io/badge/status-public_review_v1-orange)](docs/RFC-001-Agent-DID-Specification.md)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Feedback Wanted](https://img.shields.io/badge/feedback-wanted-lightgrey)](CONTRIBUTING.md)
+[![Feedback Wanted](https://img.shields.io/badge/feedback-wanted-lightgrey)](https://github.com/edisonduran/agent-did/discussions)
 
 > **Give your AI agents a verifiable identity — in the framework you already use, with or without blockchain.**
 
