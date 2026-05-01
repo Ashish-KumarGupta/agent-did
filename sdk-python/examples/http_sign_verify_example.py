@@ -1,27 +1,64 @@
-from agent_did import Identity, sign_request, verify_request
+# Run this example:
+# python sdk-python/examples/http_sign_verify_example.py
 
-def main():
-    # 1. Create identity (in-memory)
-    identity = Identity.create()
+import asyncio
+from agent_did_sdk import (
+    AgentIdentity,
+    AgentIdentityConfig,
+    CreateAgentParams,
+    InMemoryAgentRegistry,
+    SignHttpRequestParams,
+    VerifyHttpRequestSignatureParams,
+)
 
-    # 2. Create dummy HTTP request
-    request = {
-        "method": "GET",
-        "url": "https://example.com",
-        "headers": {},
-        "body": ""
-    }
 
-    # 3. Sign request
-    signed_request = sign_request(identity, request)
+async def main():
+    # 1. Set in-memory registry
+    AgentIdentity.set_registry(InMemoryAgentRegistry())
 
-    # 4. Verify request
-    is_valid = verify_request(signed_request)
+    # 2. Create identity
+    identity = AgentIdentity(
+        AgentIdentityConfig(
+            signer_address="0x9292929292929292929292929292929292929292"
+        )
+    )
+
+    created = await identity.create(
+        CreateAgentParams(
+            name="example-bot",
+            core_model="gpt-4.1-mini",
+            system_prompt="Sign outbound API requests.",
+        )
+    )
+
+    # 3. Sign HTTP request
+    headers = await identity.sign_http_request(
+        SignHttpRequestParams(
+            method="POST",
+            url="https://api.example.com/tasks",
+            body='{"taskId":7}',
+            agent_private_key=created.agent_private_key,
+            agent_did=created.document.id,
+        )
+    )
+
+    # 4. Verify HTTP request
+    ok = await AgentIdentity.verify_http_request_signature(
+        VerifyHttpRequestSignatureParams(
+            method="POST",
+            url="https://api.example.com/tasks",
+            body='{"taskId":7}',
+            headers=headers,
+        )
+    )
 
     # 5. Output result
     print({
-        "success": is_valid
+        "did": created.document.id,
+        "ok": ok,
+        "header_names": sorted(headers.keys()),
     })
 
+
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
